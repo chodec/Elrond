@@ -1,0 +1,18 @@
+for app start
+source .venv/bin/activate
+uvicorn app.main:app --reload
+deactivate
+
+db
+base.py - basic class
+session.py - db conn setup + sessionLocal
+models.py - sqlalchemy models
+
+schemas 
+- for shared logic
+user.py - app definitions (jwt, db url etc.)
+security.py - hash function
+deps - dependecies
+
+api
+- for endpoitns
