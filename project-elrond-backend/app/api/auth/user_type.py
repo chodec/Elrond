@@ -4,6 +4,6 @@ from app.schemas.user import UserRead
 
 router = APIRouter()
 
-@router.get("/auth/user/type", response_model=UserRead)
+@router.get("/auth/user/type", response_model=UserRead, tags=["Auth"])
 def read_current_user(current_user: UserRead = Depends(get_current_user)):
     return current_user

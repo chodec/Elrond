@@ -1,11 +1,9 @@
 from fastapi import FastAPI
-from app.api.system import health_check
-from app.api.auth import user_type
+from app.api import api_router
 
 app = FastAPI()
 
-app.include_router(health_check.router)
-app.include_router(user_type.router)
+app.include_router(api_router)
 
 @app.get("/")
 def read_root():
