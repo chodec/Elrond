@@ -1,7 +1,8 @@
 from fastapi import APIRouter, Header
 from app.crud.trainer.meals import get_all_meals
 from app.crud.trainer.meals import get_meal_by_id
-from app.crud.trainer.meals import create_meal
+from app.crud.trainer.meals import create_new_meal
+from app.crud.trainer.meals import delete_meal_by_id
 
 router = APIRouter()
 
@@ -14,9 +15,9 @@ def read_meal(meal_id: int):
     return get_meal_by_id(meal_id)
 
 @router.post("/trainer/meals/", tags=["Trainer"])
-def create_meal_plan(meal_name: str =  Header(...)):
-    return create_meal(meal_name)
+def create_meal(meal_name: str =  Header(...)):
+    return create_new_meal(meal_name)
 
-@router.delete("/trainer/meals/{meal_id}", tags=["Trainer"])
-def delete_meal_plan(meal_id: int):
-    return {"message": f"Delete {meal_id}"}
+@router.delete("/trainer/meals/", tags=["Trainer"])
+def delete_meal(meal_id: int =  Header(...)):
+    return ddelete_meal_by_id(meal_id)

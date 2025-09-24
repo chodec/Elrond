@@ -11,8 +11,14 @@ def get_meal_by_id(meal_id: int):
             return meal
     return "Not found"
 
-def create_meal(meal_name: str):
+def create_new_meal(meal_name: str):
     last_item = mock_db_meal[-1]
     new_id = last_item["id"] + 1
     return {new_id: meal_name}
 
+def delete_meal_by_id(meal_id: int):
+    for meal in mock_db_meal:
+        if meal["id"] == meal_id:
+            mock_db_meal.remove(meal)
+            return "{meal} removed"
+    return "Not found"
