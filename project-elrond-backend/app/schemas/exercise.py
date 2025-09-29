@@ -1,12 +1,13 @@
 from pydantic import BaseModel
 from typing import List
 
-class MealPlanCreate(BaseModel):
+class ExerciseBase(BaseModel):
     name: str
-    trainer_id: int
-    meals: List[int] 
 
-class MealPlanRead(MealPlanCreate):
+class ExerciseCreate(ExerciseBase):
+    pass
+
+class ExerciseRead(ExerciseBase):
     id: int
 
     class Config:

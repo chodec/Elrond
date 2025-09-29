@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Header
-from app.crud.trainer.meals import get_all_meals
-from app.crud.trainer.meals import get_meal_by_id
-from app.crud.trainer.meals import create_new_meal
-from app.crud.trainer.meals import delete_meal_by_id
+from app.crud.trainer.meal.meals import get_all_meals
+from app.crud.trainer.meal.meals import get_meal_by_id
+from app.crud.trainer.meal.meals import create_new_meal
+from app.crud.trainer.meal.meals import delete_meal_by_id
 
 router = APIRouter()
 
