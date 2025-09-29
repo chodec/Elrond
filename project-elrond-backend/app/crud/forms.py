@@ -69,3 +69,33 @@ mock_db_exercise_plan= [
         "meals": [1, 3]
     }
 ]
+
+mock_db_trainers = [
+    {
+        "id": 1,
+        "name": "John"
+    },
+    {
+        "id": 2,
+        "name": "Doe"
+    },
+    {
+        "id": 3,
+        "name": "Carti"
+    }
+]
+
+mock_db_clients = [
+    {
+        "id": 1,
+        "name": "John"
+    },
+    {
+        "id": 2,
+        "name": "Doe"
+    },
+    {
+        "id": 3,
+        "name": "Carti"
+    }
+]
