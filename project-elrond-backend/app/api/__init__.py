@@ -5,6 +5,8 @@ from .trainer.training import exercise
 from .trainer.training import exercise_plan
 from .system import health_check
 from .auth import user_type
+from .auth import register
+
 
 
 
@@ -19,3 +21,7 @@ api_router.include_router(exercise_plan.router)
 api_router.include_router(health_check.router)
 #auth
 api_router.include_router(user_type.router)
+api_router.include_router(
+    register.router, 
+    prefix="/auth"
+)

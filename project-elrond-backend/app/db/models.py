@@ -45,7 +45,6 @@ class Trainer(Base):
 class Client(Base):
     __tablename__ = "clients"
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), primary_key=True)
-    fitness_goal = Column(String, nullable=True)
     user = relationship("User", back_populates="client_profile")
     #Can have M trainers
     trainers = relationship(
@@ -112,7 +111,7 @@ class MealPlanAssignment(Base):
     client_id = Column(UUID(as_uuid=True), ForeignKey("clients.user_id"), nullable=False, index=True)
     meal_plan_id = Column(UUID(as_uuid=True), ForeignKey("meal_plans.id"), nullable=False, index=True)
     client = relationship("Client", back_populates="meal_assignments") 
-    meal_plan = relationship("MealPlan", back_populates="meal_plan")
+    meal_plan = relationship("MealPlan", back_populates="assignments") 
 
 # Trainer exercise
 # Flow: 
