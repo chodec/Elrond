@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session
-from app.db.models import User, Role 
+from uuid import UUID
+from app.db.models import User, Role, Client, Trainer
 from app.schemas.user import UserInitialCreate 
 
 def get_password_hash(password: str) -> str:
@@ -24,3 +25,37 @@ def create_pending_user(db: Session, user_data: UserInitialCreate) -> User:
 
 def get_user_by_email(db: Session, email: str) -> User | None:
     return db.query(User).filter(User.email == email).first()
+
+def upgrade_user_profile(
+    db: Session, 
+    user_id: UUID, 
+    new_role: Role, 
+    specialization: str | None = None
+) -> User:
+    
+    db_user = db.query(User).filter(User.id == user_id).first()
+
+    if not db_user:
+        raise ValueError("User not found") 
+
+    if db_user.role != Role.PENDING:
+        raise ValueError(f"User already got role({db_user.role.value}).")
+    
+    if new_role == Role.CLIENT:
+        db_user.role = Role.CLIENT
+        db_client = Client(user_id=user_id) 
+        db.add(db_client)
+        
+    elif new_role == Role.TRAINER:
+        db_user.role = Role.TRAINER
+        db_trainer = Trainer(user_id=user_id, specialization=None) 
+        db.add(db_trainer)
+        
+    else:
+        raise ValueError("Can upgrade only to trainer or client")
+    
+    
+    db.commit()
+    db.refresh(db_user)
+    
+    return db_user

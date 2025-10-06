@@ -1,10 +1,10 @@
-from enum import Enum
+from enum import Enum as PyEnum
 import uuid 
 from uuid import UUID 
 from pydantic import EmailStr
 from pydantic import BaseModel
 
-class UserRole(str, Enum):
+class UserRole(str, PyEnum):
     CLIENT = "client"
     TRAINER = "trainer"
     PENDING = "pending"
@@ -31,3 +31,6 @@ class User(BaseModel):
     class Config:
         from_attributes = True 
     
+class RoleUpgrade(BaseModel):
+    user_id: UUID
+    role: UserRole 
