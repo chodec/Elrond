@@ -8,6 +8,7 @@ base.py - basic class
 session.py - db conn setup + sessionLocal
 models.py - sqlalchemy models
 docker exec -it elrond-postgres_db-1 psql -U postgres -d fastapidb
+\q
 
 schemas 
 - for shared logic
