@@ -37,6 +37,10 @@ class Trainer(Base):
         secondary="client_trainer_association",
         back_populates="trainers"
     )
+
+    custom_meals = relationship("Meal", back_populates="creator")
+    custom_exercises = relationship("Exercise", back_populates="creator")
+    
     meal_plans_created = relationship("MealPlan", back_populates="creator")
     exercise_plans_created = relationship("ExercisePlan", back_populates="creator") 
 
@@ -77,6 +81,8 @@ class Meal(Base):
     __tablename__ = "meals"
     id = Column(UUID(as_uuid=True), primary_key=True, index=True, default=uuid.uuid4)
     name = Column(String, index=True, nullable=False)
+    trainer_id = Column(UUID(as_uuid=True), ForeignKey("trainers.user_id"), index=True, nullable=False)
+    creator = relationship("Trainer", back_populates="custom_meals") 
 
 
 class MealPlanEntry(Base):
@@ -125,6 +131,8 @@ class Exercise(Base):
     __tablename__ = "exercises"
     id = Column(UUID(as_uuid=True), primary_key=True, index=True, default=uuid.uuid4)
     name = Column(String, index=True, nullable=False)
+    trainer_id = Column(UUID(as_uuid=True), ForeignKey("trainers.user_id"), index=True, nullable=False)
+    creator = relationship("Trainer", back_populates="custom_exercises")
 
 
 class ExercisePlanEntry(Base):

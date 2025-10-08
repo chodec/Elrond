@@ -12,8 +12,14 @@ from .auth import register
 api_router = APIRouter()
 
 #trainer
-api_router.include_router(meal_plan.router)
-api_router.include_router(meal.router)
+api_router.include_router(
+    meal_plan.router,
+    prefix="/trainer"
+    )
+api_router.include_router(
+    meal.router,
+    prefix="/trainer"
+    )
 api_router.include_router(exercise.router)
 api_router.include_router(exercise_plan.router)
 #system

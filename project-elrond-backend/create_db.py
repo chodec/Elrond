@@ -16,7 +16,7 @@ from app.db.models import Role
 
 print("Clear tables")
 
-#Base.metadata.drop_all(bind=engine) 
+Base.metadata.drop_all(bind=engine) 
 
 enum_type = postgresql.ENUM(Role, name='role_enum')
 

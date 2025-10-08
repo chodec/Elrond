@@ -28,7 +28,10 @@ def register_user(
     
     return new_user
 
-@router.post("/onboard", status_code=status.HTTP_200_OK)
+@router.post(
+        "/onboard",
+        status_code=status.HTTP_200_OK
+)
 def onboard_user_profile(
     role_choice: RoleUpgrade,
     db: Session = Depends(get_db)
