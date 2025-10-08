@@ -17,7 +17,11 @@ api_router.include_router(meal.router)
 api_router.include_router(exercise.router)
 api_router.include_router(exercise_plan.router)
 #system
-api_router.include_router(health_check.router)
+api_router.include_router(
+    health_check.router,
+    prefix="/system"
+    )
+
 #auth
 api_router.include_router(
     register.router, 

@@ -1,8 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from uuid import UUID 
 from app.db.database import get_db 
-from app.db.models import User, Role 
+from app.db.models import Role 
 from app.schemas.user import UserInitialCreate,RoleUpgrade, User as UserSchema 
 from app.crud.auth.user import create_pending_user, get_user_by_email, upgrade_user_profile
 
