@@ -68,7 +68,6 @@ class ClientTrainerAssociation(Base):
     specialization_type = Column(String, nullable=True)
     __table_args__ = (UniqueConstraint('client_id', 'trainer_id', name='uq_client_trainer_pair'),)
 
-
 # Trainer Meals
 # Flow: 
 # 1. Trainer creates meal
@@ -95,6 +94,10 @@ class MealPlanEntry(Base):
     serving_size_grams = Column(Integer, nullable=False)
     time_slot = Column(String, nullable=False)          
     notes = Column(String, nullable=True)               
+    
+    carbohydrates_g = Column(Integer, nullable=False)
+    fat_g = Column(Integer, nullable=False)
+    protein_g = Column(Integer, nullable=False)
     
     meal_plan = relationship("MealPlan", back_populates="meal_entries")
     base_meal = relationship("Meal")
