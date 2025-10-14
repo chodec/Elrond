@@ -1,8 +1,9 @@
 from sqlalchemy.orm import Session
+from sqlalchemy import select
 from app.schemas.meal_plan import MealPlanEntryCreate
 from uuid import UUID
 from app.db.models import MealPlan, MealPlanEntry
-from typing import List
+from typing import List, Optional
 
 
 def create_meal_plan(
@@ -36,5 +37,20 @@ def create_meal_plan(
         
     db.commit()
     db.refresh(db_meal_plan)
+    
+    return db_meal_plan
+
+def read_meal_plan(
+        db: Session,
+        trainer_id: UUID,
+        meal_plan_id: UUID
+) -> Optional[MealPlan]: #mealplan could not exists
+
+    statement = select(MealPlan).where(
+        MealPlan.id == meal_plan_id,
+        MealPlan.trainer_id == trainer_id
+    )
+    
+    db_meal_plan = db.scalar(statement) #scalar returns one line
     
     return db_meal_plan

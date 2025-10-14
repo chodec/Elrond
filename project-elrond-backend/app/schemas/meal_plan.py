@@ -19,7 +19,7 @@ class MealPlanCreate(BaseModel):
 
 class MealPlanEntryRead(MealPlanEntryCreate):
     id: uuid.UUID
-
+    
 class MealPlanRead(MealPlanCreate):
     id: uuid.UUID
     meal_entries: List[MealPlanEntryRead] 

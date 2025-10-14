@@ -4,10 +4,9 @@ from uuid import UUID
 
 from app.db.database import get_db 
 from app.schemas.meal_plan import MealPlanCreate, MealPlanRead
-from app.crud.trainer_operations.meal.meal_plans import create_meal_plan 
+from app.crud.trainer_operations.meal.meal_plans import create_meal_plan, read_meal_plan
 
 router = APIRouter()
-
 
 @router.post(
     "/meal_plan", 
@@ -16,7 +15,6 @@ router = APIRouter()
 )
 def create_new_meal_plan_endpoint(
     meal_plan_data: MealPlanCreate, 
-    
     db: Session = Depends(get_db) 
 ):
     db_plan = create_meal_plan(
@@ -25,5 +23,29 @@ def create_new_meal_plan_endpoint(
         trainer_id=meal_plan_data.trainer_id,
         meal_entries_data=meal_plan_data.meal_entries
     )
+    
+    return db_plan
+
+@router.get(
+    "/meal_plan/{meal_plan_id}",
+    response_model=MealPlanRead
+)
+def read_meal_plan_by_id(
+    meal_plan_id:UUID,
+    trainer_id:UUID,
+    db:Session = Depends(get_db)
+):
+
+    db_plan = read_meal_plan(
+        db=db,
+        trainer_id=trainer_id,
+        meal_plan_id=meal_plan_id
+    )
+
+    if db_plan is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Meal plan not found or access denied. Ensure the provided Meal Plan ID and Trainer ID are correct."
+        )
     
     return db_plan
