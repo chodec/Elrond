@@ -147,7 +147,9 @@ class ExercisePlanEntry(Base):
     
     sets = Column(Integer, nullable=False)            
     repetitions = Column(String, nullable=False)         
+    day_of_week = Column(String, nullable=False)
     order_in_session = Column(Integer, nullable=False) 
+    notes = Column(String, nullable=True) 
     
     exercise_plan = relationship("ExercisePlan", back_populates="exercise_entries")
     base_exercise = relationship("Exercise")
@@ -159,9 +161,10 @@ class ExercisePlan(Base):
     name = Column(String, index=True, nullable=False)
     trainer_id = Column(UUID(as_uuid=True), ForeignKey("trainers.user_id"), index=True, nullable=False) 
     
+    notes = Column(String, nullable=True) 
+    
     creator = relationship("Trainer", back_populates="exercise_plans_created")
     assignments = relationship("ExercisePlanAssignment", back_populates="exercise_plan")
-
     exercise_entries = relationship("ExercisePlanEntry", back_populates="exercise_plan")
 
 

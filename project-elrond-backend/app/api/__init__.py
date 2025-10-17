@@ -6,22 +6,30 @@ from .trainer.training import exercise_plan
 from .system import health_check
 from .auth import register
 
-
-
-
 api_router = APIRouter()
 
-#trainer
+#trainer operations 
 api_router.include_router(
     meal_plan.router,
     prefix="/trainer"
     )
+
 api_router.include_router(
     meal.router,
     prefix="/trainer"
     )
-api_router.include_router(exercise.router)
-api_router.include_router(exercise_plan.router)
+
+api_router.include_router(
+    exercise.router,
+    prefix="/trainer"
+    )
+
+api_router.include_router(
+    exercise_plan.router,
+    prefix="/trainer"
+    )
+
+
 #system
 api_router.include_router(
     health_check.router,

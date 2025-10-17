@@ -1,14 +1,17 @@
 from pydantic import BaseModel
-from typing import List
+from uuid import UUID
 
-class ExerciseBase(BaseModel):
+class ExerciseCreate(BaseModel):
     name: str
 
-class ExerciseCreate(ExerciseBase):
-    pass
-
-class ExerciseRead(ExerciseBase):
-    id: int
-
+class ExerciseRead(BaseModel):
+    id: UUID
+    name: str
+    trainer_id: UUID 
+    
     class Config:
+        # Can read ORM model
         from_attributes = True
+
+class ExerciseCreateWithOwner(ExerciseCreate):
+    trainer_id: UUID
