@@ -1,10 +1,11 @@
 from fastapi import APIRouter, Depends, status, HTTPException
 from sqlalchemy.orm import Session
 from uuid import UUID
+from typing import List
 
 from app.db.database import get_db 
 from app.schemas.meal_plan import MealPlanCreate, MealPlanRead
-from app.crud.trainer_operations.meal.meal_plans import create_meal_plan, read_meal_plan
+from app.crud.trainer_operations.meal.meal_plans import create_meal_plan, read_meal_plan, read_meal_all_plans
 
 router = APIRouter()
 
@@ -46,6 +47,28 @@ def read_meal_plan_by_id(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Meal plan not found or access denied. Ensure the provided Meal Plan ID and Trainer ID are correct."
+        )
+    
+    return db_plan
+
+@router.get(
+    "/meal_plan/",
+    response_model=List[MealPlanRead]
+)
+def read_meal_plan_by_id(
+    trainer_id:UUID,
+    db:Session = Depends(get_db)
+):
+
+    db_plan = read_meal_all_plans(
+        db=db,
+        trainer_id=trainer_id
+    )
+
+    if not db_plan:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Meal plans not found or access denied. Make sure to create meal plan."
         )
     
     return db_plan

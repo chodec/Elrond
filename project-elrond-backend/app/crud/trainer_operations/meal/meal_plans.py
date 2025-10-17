@@ -54,3 +54,16 @@ def read_meal_plan(
     db_meal_plan = db.scalar(statement) #scalar returns one line
     
     return db_meal_plan
+
+def read_meal_all_plans(
+        db: Session,
+        trainer_id: UUID
+) -> List[MealPlan]: 
+
+    statement = select(MealPlan).where(
+        MealPlan.trainer_id == trainer_id
+    )
+    
+    db_meal_plans = db.scalars(statement).all() #scalars returns multiple lines
+    
+    return db_meal_plans
