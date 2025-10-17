@@ -1,8 +1,10 @@
 from fastapi import APIRouter, Depends, status, HTTPException
 from sqlalchemy.orm import Session
+from typing import List
+from uuid import UUID
 from app.db.database import get_db 
 from app.schemas.exercise_plan import ExercisePlanCreate, ExercisePlanRead
-from app.crud.trainer_operations.training.exercise_plans import create_exercise_plan
+from app.crud.trainer_operations.training.exercise_plans import create_exercise_plan, read_all_exercise_plans, read_exercise_plan
 
 router = APIRouter()
 
@@ -31,3 +33,47 @@ def create_new_exercise_plan_endpoint(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Could not create training plan."
         )
+    
+@router.get(
+    "/exercise_plan/{exercise_plan_id}",
+    response_model=ExercisePlanRead
+)
+def read_exercise_plan_by_id_endpoint(
+    exercise_plan_id: UUID,
+    trainer_id: UUID, 
+    db: Session = Depends(get_db)
+):
+    db_plan = read_exercise_plan(
+        db=db,
+        trainer_id=trainer_id,
+        exercise_plan_id=exercise_plan_id
+    )
+
+    if db_plan is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Exercise plan not found or access denied. Ensure the provided Exercise Plan ID and Trainer ID are correct."
+        )
+    
+    return db_plan
+
+@router.get(
+    "/exercise_plan/",
+    response_model=List[ExercisePlanRead]
+)
+def read_all_exercise_plans_endpoint(
+    trainer_id: UUID, 
+    db: Session = Depends(get_db)
+):
+    db_plans = read_all_exercise_plans(
+        db=db,
+        trainer_id=trainer_id
+    )
+
+    if not db_plans:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Exercise plans not found or access denied. Make sure to create exercise plan."
+        )
+    
+    return db_plans
