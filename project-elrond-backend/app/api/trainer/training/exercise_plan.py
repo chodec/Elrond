@@ -13,7 +13,7 @@ router = APIRouter()
     response_model=ExercisePlanRead, 
     status_code=status.HTTP_201_CREATED
 )
-def create_new_exercise_plan_endpoint(
+def create_new_exercise_plan(
     exercise_plan_data: ExercisePlanCreate,
     db: Session = Depends(get_db) 
 ):
@@ -38,7 +38,7 @@ def create_new_exercise_plan_endpoint(
     "/exercise_plan/{exercise_plan_id}",
     response_model=ExercisePlanRead
 )
-def read_exercise_plan_by_id_endpoint(
+def get_exercise_plan_by_id(
     exercise_plan_id: UUID,
     trainer_id: UUID, 
     db: Session = Depends(get_db)
@@ -61,7 +61,7 @@ def read_exercise_plan_by_id_endpoint(
     "/exercise_plan/",
     response_model=List[ExercisePlanRead]
 )
-def read_all_exercise_plans_endpoint(
+def get_all_exercise_plans(
     trainer_id: UUID, 
     db: Session = Depends(get_db)
 ):

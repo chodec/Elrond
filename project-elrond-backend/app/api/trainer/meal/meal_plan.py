@@ -14,7 +14,7 @@ router = APIRouter()
     response_model=MealPlanRead, 
     status_code=status.HTTP_201_CREATED
 )
-def create_new_meal_plan_endpoint(
+def create_new_meal_plan(
     meal_plan_data: MealPlanCreate, 
     db: Session = Depends(get_db) 
 ):
@@ -31,7 +31,7 @@ def create_new_meal_plan_endpoint(
     "/meal_plan/{meal_plan_id}",
     response_model=MealPlanRead
 )
-def read_meal_plan_by_id(
+def get_meal_plan_by_id(
     meal_plan_id:UUID,
     trainer_id:UUID,
     db:Session = Depends(get_db)
@@ -55,7 +55,7 @@ def read_meal_plan_by_id(
     "/meal_plan/",
     response_model=List[MealPlanRead]
 )
-def read_meal_plan_by_id(
+def get_all_meal_plans(
     trainer_id:UUID,
     db:Session = Depends(get_db)
 ):

@@ -48,6 +48,7 @@ def read_exercise_plan(
         trainer_id: UUID,
         exercise_plan_id: UUID
 ) -> Optional[dbExercisePlan]:
+    
     statement = select(dbExercisePlan).where(
         dbExercisePlan.id == exercise_plan_id,
         dbExercisePlan.trainer_id == trainer_id
