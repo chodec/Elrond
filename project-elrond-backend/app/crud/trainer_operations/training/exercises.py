@@ -21,30 +21,35 @@ def create_exercise(
 
     return db_exercise
 
-def read_exercise(db: Session, exercise_id: UUID, trainer_id: UUID) -> Optional[Exercise]:
-    
-    db_meal = select(Exercise).where(
-        Exercise.id == exercise_id,
-        Exercise.trainer_id == trainer_id
-    )
+def read_exercise(
+        db: Session,
+        exercise_id: UUID,
+        trainer_id: UUID
+        ) -> Optional[Exercise]:
 
     statement = select(Exercise).where(
         Exercise.id == exercise_id,
         Exercise.trainer_id == trainer_id
     )
 
-    db_meal = db.scalar(statement)
+    db_exercise = db.scalar(statement)
 
-    return db_meal
+    return db_exercise
 
 def read_all_exercises(
         db: Session,
-        trainer_id: UUID
+        trainer_id: UUID,
+        search: Optional[str] = None
 ) -> List[Exercise]:
 
     statement = select(Exercise).where(
         Exercise.trainer_id == trainer_id
     )
+
+    if search:
+        statement = statement.where(
+            Exercise.name.ilike(f"%{search}%")
+        )
     
     db_exercises = db.scalars(statement).all()
     

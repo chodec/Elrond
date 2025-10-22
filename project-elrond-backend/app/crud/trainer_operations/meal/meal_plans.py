@@ -57,11 +57,17 @@ def read_meal_plan(
 
 def read_meal_all_plans(
         db: Session,
-        trainer_id: UUID
+        trainer_id: UUID,
+        search: Optional[str] = None
 ) -> List[MealPlan]: 
 
     statement = select(MealPlan).where(
         MealPlan.trainer_id == trainer_id
+    )
+
+    if search:
+        statement = statement.where(
+            MealPlan.name.ilike(f"%{search}%")
     )
     
     db_meal_plans = db.scalars(statement).all() #scalars returns multiple lines

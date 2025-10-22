@@ -60,11 +60,17 @@ def read_exercise_plan(
 
 def read_all_exercise_plans(
         db: Session,
-        trainer_id: UUID
+        trainer_id: UUID,
+        search: Optional[str] = None
 ) -> List[dbExercisePlan]:
 
     statement = select(dbExercisePlan).where(
         dbExercisePlan.trainer_id == trainer_id
+    )
+
+    if search:
+        statement = statement.where(
+            dbExercisePlan.name.ilike(f"%{search}%")
     )
     
     db_exercise_plans = db.scalars(statement).all()

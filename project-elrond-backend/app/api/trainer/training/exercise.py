@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, status, HTTPException
 from sqlalchemy.orm import Session
-from typing import List
+from typing import List, Optional
 from uuid import UUID
 from app.db.database import get_db 
 from app.schemas.exercise import ExerciseRead, ExerciseCreateWithOwner
@@ -60,18 +60,20 @@ def get_exercise_by_id(
     response_model=List[ExerciseRead]
 )
 def get_all_exercises(
-    trainer_id: UUID, 
+    trainer_id: UUID,
+    search: Optional[str] = None, 
     db: Session = Depends(get_db)
 ):
-    db_plans = read_all_exercises(
+    db_exercise = read_all_exercises(
         db=db,
+        search=search,
         trainer_id=trainer_id
     )
 
-    if not db_plans:
+    if not db_exercise:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Exercises not found or access denied. Make sure to create exercise plan."
         )
     
-    return db_plans
+    return db_exercise

@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, status, HTTPException
 from sqlalchemy.orm import Session
 from uuid import UUID
-from typing import List
+from typing import List, Optional
 
 from app.db.database import get_db 
 from app.schemas.meal_plan import MealPlanCreate, MealPlanRead
@@ -57,11 +57,13 @@ def get_meal_plan_by_id(
 )
 def get_all_meal_plans(
     trainer_id:UUID,
+    search: Optional[str] = None, 
     db:Session = Depends(get_db)
 ):
 
     db_plan = read_meal_all_plans(
         db=db,
+        search=search,
         trainer_id=trainer_id
     )
 

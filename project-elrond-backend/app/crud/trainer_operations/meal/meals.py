@@ -35,13 +35,19 @@ def read_meal(db: Session, meal_id: UUID, trainer_id: UUID) -> Optional[Meal]:
 
 def read_all_meals(
         db: Session,
-        trainer_id: UUID
+        trainer_id: UUID,
+        search: Optional[str] = None
 ) -> List[Meal]:
 
     statement = select(Meal).where(
         Meal.trainer_id == trainer_id
     )
+
+    if search:
+        statement = statement.where(
+            Meal.name.ilike(f"%{search}%")
+    )
+
+    db_meals = db.scalars(statement).all()
     
-    db_exercises = db.scalars(statement).all()
-    
-    return db_exercises
+    return db_meals

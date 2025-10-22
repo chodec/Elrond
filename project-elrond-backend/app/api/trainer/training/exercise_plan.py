@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, status, HTTPException
 from sqlalchemy.orm import Session
-from typing import List
+from typing import List, Optional
 from uuid import UUID
 from app.db.database import get_db 
 from app.schemas.exercise_plan import ExercisePlanCreate, ExercisePlanRead
@@ -63,10 +63,12 @@ def get_exercise_plan_by_id(
 )
 def get_all_exercise_plans(
     trainer_id: UUID, 
+    search: Optional[str] = None, 
     db: Session = Depends(get_db)
 ):
     db_plans = read_all_exercise_plans(
         db=db,
+        search=search,
         trainer_id=trainer_id
     )
 
