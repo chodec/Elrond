@@ -1,5 +1,5 @@
 import uuid
-from sqlalchemy import Column, Integer, String, ForeignKey, Boolean
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Numeric
 from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import ARRAY, ENUM as PgEnum, UUID # Importujeme UUID
 from sqlalchemy.schema import UniqueConstraint
@@ -57,8 +57,24 @@ class Client(Base):
         back_populates="clients_trained"
     )
     meal_assignments = relationship("MealPlanAssignment", back_populates="client")
-    exercise_assignments = relationship("ExercisePlanAssignment", back_populates="client") 
+    exercise_assignments = relationship("ExercisePlanAssignment", back_populates="client")
+    measurements = relationship("ClientMeasurement", back_populates="client")
 
+class ClientMeasurement(Base):
+    __tablename__ = "client_measurements"
+    
+    id = Column(UUID(as_uuid=True), primary_key=True, index=True, default=uuid.uuid4)
+    client_id = Column(UUID(as_uuid=True), ForeignKey("clients.user_id"), index=True, nullable=False)
+    
+    date = Column(DateTime(timezone=True), nullable=False)
+    body_weight = Column(Numeric, nullable=False)
+    biceps_size = Column(Numeric, nullable=True)
+    waist_size = Column(Numeric, nullable=True)
+    chest_size = Column(Numeric, nullable=True)
+    thigh_size = Column(Numeric, nullable=True)
+    notes = Column(String, nullable=True)
+    
+    client = relationship("Client", back_populates="measurements")
 
 # M:N relationshiop between trainer and client
 class ClientTrainerAssociation(Base):
