@@ -3,6 +3,7 @@ from .trainer.meal import meal_plan
 from .trainer.meal import meal
 from .trainer.training import exercise
 from .trainer.training import exercise_plan
+from .trainer.subscription import subscription
 from .client import measurement
 from .system import health_check
 from .auth import register
@@ -27,6 +28,11 @@ api_router.include_router(
 
 api_router.include_router(
     exercise_plan.router,
+    prefix="/trainer"
+    )
+
+api_router.include_router(
+    subscription.router,
     prefix="/trainer"
     )
 

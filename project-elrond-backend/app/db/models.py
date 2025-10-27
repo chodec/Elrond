@@ -1,8 +1,9 @@
 import uuid
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Numeric
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Numeric, Boolean
 from sqlalchemy.orm import relationship
-from sqlalchemy.dialects.postgresql import ARRAY, ENUM as PgEnum, UUID # Importujeme UUID
+from sqlalchemy.dialects.postgresql import ARRAY, ENUM as PgEnum, UUID
 from sqlalchemy.schema import UniqueConstraint
+from sqlalchemy.sql import func
 from enum import Enum as PyEnum
 from .database import Base 
 
@@ -13,6 +14,19 @@ class Role(PyEnum):
 
 role_enum = PgEnum(Role, name="role_enum", create_type=False)
 
+class RequestStatus(PyEnum):
+    PENDING = "pending"
+    ACCEPTED = "accepted"
+    REJECTED = "rejected"
+
+request_status_enum = PgEnum(RequestStatus, name="request_status_enum", create_type=False)
+
+class PaymentStatus(PyEnum):
+    MOCKED_PAID = "mocked_paid"
+    MOCKED_FREE = "mocked_free"
+    EXPIRED = "expired"
+
+payment_status_enum = PgEnum(PaymentStatus, name="payment_status_enum", create_type=False)
 
 class User(Base):
     __tablename__ = "users"
@@ -30,6 +44,9 @@ class Trainer(Base):
     __tablename__ = "trainers"
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), primary_key=True)
     specialization = Column(String, nullable=True)
+    
+    max_clients = Column(Integer, default=20, nullable=False)
+    
     user = relationship("User", back_populates="trainer_profile")
     # Can have N clients
     clients_trained = relationship(
@@ -43,8 +60,24 @@ class Trainer(Base):
     
     meal_plans_created = relationship("MealPlan", back_populates="creator")
     exercise_plans_created = relationship("ExercisePlan", back_populates="creator") 
+    
+    subscription_tiers = relationship("TrainerSubscriptionTier", back_populates="creator")
 
 
+class TrainerSubscriptionTier(Base):
+    __tablename__ = "trainer_subscription_tiers"
+    id = Column(UUID(as_uuid=True), primary_key=True, index=True, default=uuid.uuid4)
+    
+    trainer_id = Column(UUID(as_uuid=True), ForeignKey("trainers.user_id"), index=True, nullable=False)
+    name = Column(String, nullable=False)
+    description = Column(String, nullable=True)
+    
+    price_monthly = Column(Numeric, nullable=False)
+    price_yearly = Column(Numeric, nullable=True)
+    discount_percent = Column(Numeric, default=0, nullable=False)
+    is_active = Column(Boolean, default=True, nullable=False)
+    
+    creator = relationship("Trainer", back_populates="subscription_tiers")
 
 class Client(Base):
     __tablename__ = "clients"
