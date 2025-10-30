@@ -14,7 +14,6 @@ class MealPlanEntryCreate(BaseModel):
 
 class MealPlanCreate(BaseModel):
     name: str
-    trainer_id: uuid.UUID 
     meal_entries: List[MealPlanEntryCreate] 
 
 class MealPlanEntryRead(MealPlanEntryCreate):

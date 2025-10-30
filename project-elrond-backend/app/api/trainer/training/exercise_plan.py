@@ -1,12 +1,19 @@
 from fastapi import APIRouter, Depends, status, HTTPException
 from sqlalchemy.orm import Session
 from typing import List, Optional
+import os
+from dotenv import load_dotenv
 from uuid import UUID
 from app.db.database import get_db 
 from app.schemas.exercise_plan import ExercisePlanCreate, ExercisePlanRead
 from app.crud.trainer_operations.training.exercise_plans import create_exercise_plan, read_all_exercise_plans, read_exercise_plan
 
 router = APIRouter()
+
+def get_current_trainer_id() -> UUID:
+    # TODO auth
+    return UUID(os.getenv("ID_TRAINER"))
+
 
 @router.post(
     "/exercise_plan", 
@@ -21,7 +28,7 @@ def create_new_exercise_plan(
         db_plan = create_exercise_plan(
             db=db,
             plan_name=exercise_plan_data.name,
-            trainer_id=exercise_plan_data.trainer_id,
+            trainer_id=get_current_trainer_id(),
             notes=exercise_plan_data.notes,
             exercise_entries_data=exercise_plan_data.exercise_entries
         )
@@ -40,12 +47,11 @@ def create_new_exercise_plan(
 )
 def get_exercise_plan_by_id(
     exercise_plan_id: UUID,
-    trainer_id: UUID, 
     db: Session = Depends(get_db)
 ):
     db_plan = read_exercise_plan(
         db=db,
-        trainer_id=trainer_id,
+        trainer_id=get_current_trainer_id(),
         exercise_plan_id=exercise_plan_id
     )
 
@@ -62,14 +68,13 @@ def get_exercise_plan_by_id(
     response_model=List[ExercisePlanRead]
 )
 def get_all_exercise_plans(
-    trainer_id: UUID, 
     search: Optional[str] = None, 
     db: Session = Depends(get_db)
 ):
     db_plans = read_all_exercise_plans(
         db=db,
         search=search,
-        trainer_id=trainer_id
+        trainer_id=get_current_trainer_id()
     )
 
     if not db_plans:

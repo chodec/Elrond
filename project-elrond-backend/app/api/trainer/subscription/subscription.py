@@ -1,6 +1,8 @@
 from fastapi import APIRouter, Depends, status, HTTPException, Query
 from sqlalchemy.orm import Session
 from uuid import UUID
+import os
+from dotenv import load_dotenv
 from typing import List
 from app.db.database import get_db 
 from app.schemas.trainer_subscription_tier import (
@@ -15,7 +17,7 @@ router = APIRouter()
 # MOCK auth
 def get_current_trainer_id() -> UUID:
     # TODO auth
-    return UUID("51de6fae-a17a-422c-ba7d-cdd7c3eab189")
+    return UUID(os.getenv("ID_TRAINER"))
 
 
 @router.get(

@@ -2,12 +2,17 @@ from fastapi import APIRouter, Depends, status, HTTPException
 from sqlalchemy.orm import Session
 from uuid import UUID
 from typing import List, Optional
-
+import os
+from dotenv import load_dotenv
 from app.db.database import get_db 
 from app.schemas.meal_plan import MealPlanCreate, MealPlanRead
 from app.crud.trainer_operations.meal.meal_plans import create_meal_plan, read_meal_plan, read_meal_all_plans
 
 router = APIRouter()
+
+def get_current_trainer_id() -> UUID:
+    # TODO auth
+    return UUID(os.getenv("ID_TRAINER"))
 
 @router.post(
     "/meal_plan", 
@@ -21,7 +26,7 @@ def create_new_meal_plan(
     db_plan = create_meal_plan(
         db=db,
         meal_plan_name=meal_plan_data.name,
-        trainer_id=meal_plan_data.trainer_id,
+        trainer_id=get_current_trainer_id(),
         meal_entries_data=meal_plan_data.meal_entries
     )
     
@@ -33,13 +38,12 @@ def create_new_meal_plan(
 )
 def get_meal_plan_by_id(
     meal_plan_id:UUID,
-    trainer_id:UUID,
     db:Session = Depends(get_db)
 ):
 
     db_plan = read_meal_plan(
         db=db,
-        trainer_id=trainer_id,
+        trainer_id=get_current_trainer_id(),
         meal_plan_id=meal_plan_id
     )
 
@@ -56,7 +60,6 @@ def get_meal_plan_by_id(
     response_model=List[MealPlanRead]
 )
 def get_all_meal_plans(
-    trainer_id:UUID,
     search: Optional[str] = None, 
     db:Session = Depends(get_db)
 ):
@@ -64,7 +67,7 @@ def get_all_meal_plans(
     db_plan = read_meal_all_plans(
         db=db,
         search=search,
-        trainer_id=trainer_id
+        trainer_id=get_current_trainer_id()
     )
 
     if not db_plan:

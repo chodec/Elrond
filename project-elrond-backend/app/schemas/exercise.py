@@ -12,6 +12,3 @@ class ExerciseRead(BaseModel):
     class Config:
         # Can read ORM model
         from_attributes = True
-
-class ExerciseCreateWithOwner(ExerciseCreate):
-    trainer_id: UUID

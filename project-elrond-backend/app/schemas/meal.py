@@ -7,10 +7,6 @@ class MealCreate(BaseModel):
 class Meal(BaseModel):
     id: UUID
     name: str
-    trainer_id: UUID 
     
     class Config:
         from_attributes = True
-
-class MealCreateWithOwner(MealCreate):
-    trainer_id: UUID

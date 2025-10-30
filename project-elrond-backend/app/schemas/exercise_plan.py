@@ -15,7 +15,6 @@ class ExercisePlanEntryCreate(BaseModel):
 
 class ExercisePlanCreate(BaseModel):
     name: str
-    trainer_id: UUID 
     
     notes: Optional[str] = None 
     

@@ -2,13 +2,19 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from uuid import UUID
+import os
+from dotenv import load_dotenv
 from app.db.database import get_db 
 from app.db.models import Meal 
-from app.schemas.meal import MealCreate, MealCreateWithOwner, Meal as MealSchema
+from app.schemas.meal import MealCreate, Meal as MealSchema
 from app.crud.trainer_operations.meal.meals import create_meal, read_meal, read_all_meals
 
 
 router = APIRouter()
+
+def get_current_trainer_id() -> UUID:
+    # TODO auth
+    return UUID(os.getenv("ID_TRAINER"))
 
 @router.post(
     "/meal", 
@@ -16,11 +22,15 @@ router = APIRouter()
     status_code=status.HTTP_201_CREATED
 )
 def create_new_meal(
-    data: MealCreateWithOwner, 
+    data: MealCreate, 
     db: Session = Depends(get_db)
 ):
 
-    new_meal = create_meal(db, meal_name=data.name, trainer_id=data.trainer_id)
+    new_meal = create_meal(
+        db,
+        meal_name=data.name,
+        trainer_id=get_current_trainer_id()
+    )
     
     return new_meal
 
@@ -30,13 +40,12 @@ def create_new_meal(
 )
 def get_meal_by_id(
     meal_id: UUID,
-    trainer_id: UUID, 
     db: Session = Depends(get_db)
 ):
     db_plan = read_meal(
         db=db,
         meal_id=meal_id,
-        trainer_id=trainer_id
+        trainer_id=get_current_trainer_id()
     )
 
     if db_plan is None:
@@ -52,14 +61,13 @@ def get_meal_by_id(
     response_model=List[MealSchema]
 )
 def get_all_meals(
-    trainer_id: UUID, 
     search: Optional[str] = None, 
     db: Session = Depends(get_db)
 ):
     db_plans = read_all_meals(
         db=db,
         search=search,
-        trainer_id=trainer_id
+        trainer_id=get_current_trainer_id()
     )
 
     if not db_plans:
