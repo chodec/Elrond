@@ -17,10 +17,14 @@ SQLALCHEMY_DATABASE_URL = (
 
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL,
-    echo=False
+    echo = False
 )
 
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+SessionLocal = sessionmaker(
+    autocommit = False,
+    autoflush = False,
+    bind = engine
+)
 
 Base = declarative_base()
 

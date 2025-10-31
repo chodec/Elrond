@@ -16,20 +16,19 @@ class PaginatedMeasurementResponse(GenericModel, Generic[T]):
 class ClientMeasurementBase(BaseModel):
     date: datetime.datetime = Field(...)
     
-    body_weight: Decimal = Field(..., gt=0)
-    biceps_size: Optional[Decimal] = Field(None, gt=0)
-    waist_size: Optional[Decimal] = Field(None, gt=0)
-    chest_size: Optional[Decimal] = Field(None, gt=0)
-    thigh_size: Optional[Decimal] = Field(None, gt=0)
+    body_weight: Decimal = Field(..., gt = 0)
+    biceps_size: Optional[Decimal] = Field(None, gt = 0)
+    waist_size: Optional[Decimal] = Field(None, gt = 0)
+    chest_size: Optional[Decimal] = Field(None, gt = 0)
+    thigh_size: Optional[Decimal] = Field(None, gt = 0)
     
-    notes: Optional[str] = Field(None, max_length=500)
+    notes: Optional[str] = Field(None, max_length = 500)
 
 class ClientMeasurementCreate(ClientMeasurementBase):
    pass 
 
 class ClientMeasurement(ClientMeasurementBase):
     id: UUID
-    client_id: UUID
     
     class Config:
         from_attributes = True
@@ -37,10 +36,10 @@ class ClientMeasurement(ClientMeasurementBase):
 class ClientMeasurementUpdate(BaseModel):
     date: Optional[datetime.datetime] = None
     
-    body_weight: Optional[Decimal] = Field(None, gt=0)
-    biceps_size: Optional[Decimal] = Field(None, gt=0)
-    waist_size: Optional[Decimal] = Field(None, gt=0)
-    chest_size: Optional[Decimal] = Field(None, gt=0)
-    thigh_size: Optional[Decimal] = Field(None, gt=0)
+    body_weight: Optional[Decimal] = Field(None, gt = 0)
+    biceps_size: Optional[Decimal] = Field(None, gt = 0)
+    waist_size: Optional[Decimal] = Field(None, gt = 0)
+    chest_size: Optional[Decimal] = Field(None, gt = 0)
+    thigh_size: Optional[Decimal] = Field(None, gt = 0)
     
-    notes: Optional[str] = Field(None, max_length=500)
+    notes: Optional[str] = Field(None, max_length = 500)

@@ -12,110 +12,111 @@ class Role(PyEnum):
     TRAINER = "trainer"
     PENDING = "pending"
 
-role_enum = PgEnum(Role, name="role_enum", create_type=False)
+role_enum = PgEnum(Role, name = "role_enum", create_type = False)
 
 class RequestStatus(PyEnum):
-    PENDING = "pending"
-    ACCEPTED = "accepted"
-    REJECTED = "rejected"
+    PENDING = "pending"       # waiting for trainer
+    ACCEPTED = "accepted"     # approved by trainer
+    REJECTED = "rejected"     # rejected by trainer
+    CANCELLED = "cancelled"   # rejected by client
 
-request_status_enum = PgEnum(RequestStatus, name="request_status_enum", create_type=False)
+request_status_enum = PgEnum(RequestStatus, name = "request_status_enum", create_type = False)
 
 class PaymentStatus(PyEnum):
     MOCKED_PAID = "mocked_paid"
     MOCKED_FREE = "mocked_free"
     EXPIRED = "expired"
 
-payment_status_enum = PgEnum(PaymentStatus, name="payment_status_enum", create_type=False)
+payment_status_enum = PgEnum(PaymentStatus, name = "payment_status_enum", create_type = False)
 
 class User(Base):
     __tablename__ = "users"
-    id = Column(UUID(as_uuid=True), primary_key=True, index=True, default=uuid.uuid4)
-    email = Column(String, unique=True, index=True, nullable=False)
-    hashed_password = Column(String, nullable=False)
-    name = Column(String, nullable=False)
-    role = Column(role_enum, default=Role.PENDING, nullable=False) 
+    id = Column(UUID(as_uuid = True), primary_key = True, index = True, default = uuid.uuid4)
+    email = Column(String, unique = True, index = True, nullable = False)
+    hashed_password = Column(String, nullable = False)
+    name = Column(String, nullable = False)
+    role = Column(role_enum, default = Role.PENDING, nullable = False) 
     
-    trainer_profile = relationship("Trainer", back_populates="user", uselist=False)
-    client_profile = relationship("Client", back_populates="user", uselist=False)
+    trainer_profile = relationship("Trainer", back_populates = "user", uselist = False)
+    client_profile = relationship("Client", back_populates = "user", uselist = False)
 
 
 class Trainer(Base):
     __tablename__ = "trainers"
-    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), primary_key=True)
-    specialization = Column(String, nullable=True)
+    user_id = Column(UUID(as_uuid = True), ForeignKey("users.id"), primary_key = True)
+    specialization = Column(String, nullable = True)
     
-    max_clients = Column(Integer, default=20, nullable=False)
+    max_clients = Column(Integer, default = 20, nullable = False)
     
-    user = relationship("User", back_populates="trainer_profile")
+    user = relationship("User", back_populates = "trainer_profile")
     # Can have N clients
     clients_trained = relationship(
         "Client",
-        secondary="client_trainer_association",
-        back_populates="trainers"
+        secondary = "client_trainer_association",
+        back_populates = "trainers"
     )
 
-    custom_meals = relationship("Meal", back_populates="creator")
-    custom_exercises = relationship("Exercise", back_populates="creator")
+    custom_meals = relationship("Meal", back_populates = "creator")
+    custom_exercises = relationship("Exercise", back_populates = "creator")
     
-    meal_plans_created = relationship("MealPlan", back_populates="creator")
-    exercise_plans_created = relationship("ExercisePlan", back_populates="creator") 
+    meal_plans_created = relationship("MealPlan", back_populates = "creator")
+    exercise_plans_created = relationship("ExercisePlan", back_populates = "creator") 
     
-    subscription_tiers = relationship("TrainerSubscriptionTier", back_populates="creator")
+    subscription_tiers = relationship("TrainerSubscriptionTier", back_populates = "creator")
 
 
 class TrainerSubscriptionTier(Base):
     __tablename__ = "trainer_subscription_tiers"
-    id = Column(UUID(as_uuid=True), primary_key=True, index=True, default=uuid.uuid4)
+    id = Column(UUID(as_uuid = True), primary_key = True, index = True, default = uuid.uuid4)
     
-    trainer_id = Column(UUID(as_uuid=True), ForeignKey("trainers.user_id"), index=True, nullable=False)
-    name = Column(String, nullable=False)
-    description = Column(String, nullable=True)
+    trainer_id = Column(UUID(as_uuid = True), ForeignKey("trainers.user_id"), index = True, nullable = False)
+    name = Column(String, nullable = False)
+    description = Column(String, nullable = True)
     
-    price_monthly = Column(Numeric, nullable=False)
-    price_yearly = Column(Numeric, nullable=True)
-    discount_percent = Column(Numeric, default=0, nullable=False)
-    is_active = Column(Boolean, default=True, nullable=False)
+    price_monthly = Column(Numeric, nullable = False)
+    price_yearly = Column(Numeric, nullable = True)
+    discount_percent = Column(Numeric, default = 0, nullable = False)
+    is_active = Column(Boolean, default = True, nullable = False)
     
-    creator = relationship("Trainer", back_populates="subscription_tiers")
+    creator = relationship("Trainer", back_populates = "subscription_tiers")
 
 class Client(Base):
     __tablename__ = "clients"
-    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), primary_key=True)
-    user = relationship("User", back_populates="client_profile")
+    user_id = Column(UUID(as_uuid = True), ForeignKey("users.id"), primary_key = True)
+    user = relationship("User", back_populates = "client_profile")
     #Can have M trainers
     trainers = relationship(
         "Trainer",
-        secondary="client_trainer_association",
-        back_populates="clients_trained"
+        secondary = "client_trainer_association",
+        back_populates = "clients_trained"
     )
-    meal_assignments = relationship("MealPlanAssignment", back_populates="client")
-    exercise_assignments = relationship("ExercisePlanAssignment", back_populates="client")
-    measurements = relationship("ClientMeasurement", back_populates="client")
+    meal_assignments = relationship("MealPlanAssignment", back_populates = "client")
+    exercise_assignments = relationship("ExercisePlanAssignment", back_populates = "client")
+    measurements = relationship("ClientMeasurement", back_populates = "client")
 
 class ClientMeasurement(Base):
     __tablename__ = "client_measurements"
     
-    id = Column(UUID(as_uuid=True), primary_key=True, index=True, default=uuid.uuid4)
-    client_id = Column(UUID(as_uuid=True), ForeignKey("clients.user_id"), index=True, nullable=False)
+    id = Column(UUID(as_uuid = True), primary_key = True, index = True, default = uuid.uuid4)
+    client_id = Column(UUID(as_uuid = True), ForeignKey("clients.user_id"), index = True, nullable = False)
     
-    date = Column(DateTime(timezone=True), nullable=False)
-    body_weight = Column(Numeric, nullable=False)
-    biceps_size = Column(Numeric, nullable=True)
-    waist_size = Column(Numeric, nullable=True)
-    chest_size = Column(Numeric, nullable=True)
-    thigh_size = Column(Numeric, nullable=True)
-    notes = Column(String, nullable=True)
+    date = Column(DateTime(timezone = True), nullable = False)
+    body_weight = Column(Numeric, nullable = False)
+    biceps_size = Column(Numeric, nullable = True)
+    waist_size = Column(Numeric, nullable = True)
+    chest_size = Column(Numeric, nullable = True)
+    thigh_size = Column(Numeric, nullable = True)
+    notes = Column(String, nullable = True)
     
-    client = relationship("Client", back_populates="measurements")
+    client = relationship("Client", back_populates = "measurements")
 
 # M:N relationshiop between trainer and client
 class ClientTrainerAssociation(Base):
     __tablename__ = "client_trainer_association"
-    client_id = Column(UUID(as_uuid=True), ForeignKey("clients.user_id"), primary_key=True)
-    trainer_id = Column(UUID(as_uuid=True), ForeignKey("trainers.user_id"), primary_key=True)
-    specialization_type = Column(String, nullable=True)
-    __table_args__ = (UniqueConstraint('client_id', 'trainer_id', name='uq_client_trainer_pair'),)
+    client_id = Column(UUID(as_uuid = True), ForeignKey("clients.user_id"), primary_key = True)
+    trainer_id = Column(UUID(as_uuid = True), ForeignKey("trainers.user_id"), primary_key = True)
+    specialization_type = Column(String, nullable = True)
+    __table_args__ = (UniqueConstraint('client_id', 'trainer_id', name = 'uq_client_trainer_pair'),)
 
 # Trainer Meals
 # Flow: 
@@ -127,49 +128,49 @@ class ClientTrainerAssociation(Base):
 
 class Meal(Base):
     __tablename__ = "meals"
-    id = Column(UUID(as_uuid=True), primary_key=True, index=True, default=uuid.uuid4)
-    name = Column(String, index=True, nullable=False)
-    trainer_id = Column(UUID(as_uuid=True), ForeignKey("trainers.user_id"), index=True, nullable=False)
-    creator = relationship("Trainer", back_populates="custom_meals") 
+    id = Column(UUID(as_uuid = True), primary_key = True, index = True, default = uuid.uuid4)
+    name = Column(String, index = True, nullable = False)
+    trainer_id = Column(UUID(as_uuid = True), ForeignKey("trainers.user_id"), index = True, nullable = False)
+    creator = relationship("Trainer", back_populates = "custom_meals") 
 
 
 class MealPlanEntry(Base):
     __tablename__ = "meal_plan_entries"
-    id = Column(UUID(as_uuid=True), primary_key=True, index=True, default=uuid.uuid4)
+    id = Column(UUID(as_uuid = True), primary_key = True, index = True, default = uuid.uuid4)
     
-    meal_plan_id = Column(UUID(as_uuid=True), ForeignKey("meal_plans.id"), index=True, nullable=False)
-    base_meal_id = Column(UUID(as_uuid=True), ForeignKey("meals.id"), index=True, nullable=False)
+    meal_plan_id = Column(UUID(as_uuid = True), ForeignKey("meal_plans.id"), index = True, nullable = False)
+    base_meal_id = Column(UUID(as_uuid = True), ForeignKey("meals.id"), index = True, nullable = False)
     
-    serving_size_grams = Column(Integer, nullable=False)
-    time_slot = Column(String, nullable=False)          
-    notes = Column(String, nullable=True)               
+    serving_size_grams = Column(Integer, nullable = False)
+    time_slot = Column(String, nullable = False)          
+    notes = Column(String, nullable = True)               
     
-    carbohydrates_g = Column(Integer, nullable=False)
-    fat_g = Column(Integer, nullable=False)
-    protein_g = Column(Integer, nullable=False)
+    carbohydrates_g = Column(Integer, nullable = False)
+    fat_g = Column(Integer, nullable = False)
+    protein_g = Column(Integer, nullable = False)
     
-    meal_plan = relationship("MealPlan", back_populates="meal_entries")
+    meal_plan = relationship("MealPlan", back_populates = "meal_entries")
     base_meal = relationship("Meal")
 
 
 class MealPlan(Base):
     __tablename__ = "meal_plans"
-    id = Column(UUID(as_uuid=True), primary_key=True, index=True, default=uuid.uuid4)
-    name = Column(String, index=True, nullable=False)
-    trainer_id = Column(UUID(as_uuid=True), ForeignKey("trainers.user_id"), index=True, nullable=False) 
-    creator = relationship("Trainer", back_populates="meal_plans_created")
-    assignments = relationship("MealPlanAssignment", back_populates="meal_plan")
+    id = Column(UUID(as_uuid = True), primary_key = True, index = True, default = uuid.uuid4)
+    name = Column(String, index = True, nullable = False)
+    trainer_id = Column(UUID(as_uuid = True), ForeignKey("trainers.user_id"), index = True, nullable = False) 
+    creator = relationship("Trainer", back_populates = "meal_plans_created")
+    assignments = relationship("MealPlanAssignment", back_populates = "meal_plan")
     
-    meal_entries = relationship("MealPlanEntry", back_populates="meal_plan")
+    meal_entries = relationship("MealPlanEntry", back_populates = "meal_plan")
 
 
 class MealPlanAssignment(Base):
     __tablename__ = "meal_plan_assignments"
-    id = Column(UUID(as_uuid=True), primary_key=True, index=True, default=uuid.uuid4)
-    client_id = Column(UUID(as_uuid=True), ForeignKey("clients.user_id"), nullable=False, index=True)
-    meal_plan_id = Column(UUID(as_uuid=True), ForeignKey("meal_plans.id"), nullable=False, index=True)
-    client = relationship("Client", back_populates="meal_assignments") 
-    meal_plan = relationship("MealPlan", back_populates="assignments") 
+    id = Column(UUID(as_uuid = True), primary_key = True, index = True, default = uuid.uuid4)
+    client_id = Column(UUID(as_uuid = True), ForeignKey("clients.user_id"), nullable = False, index = True)
+    meal_plan_id = Column(UUID(as_uuid = True), ForeignKey("meal_plans.id"), nullable = False, index = True)
+    client = relationship("Client", back_populates = "meal_assignments") 
+    meal_plan = relationship("MealPlan", back_populates = "assignments") 
 
 # Trainer exercise
 # Flow: 
@@ -181,46 +182,46 @@ class MealPlanAssignment(Base):
 
 class Exercise(Base):
     __tablename__ = "exercises"
-    id = Column(UUID(as_uuid=True), primary_key=True, index=True, default=uuid.uuid4)
-    name = Column(String, index=True, nullable=False)
-    trainer_id = Column(UUID(as_uuid=True), ForeignKey("trainers.user_id"), index=True, nullable=False)
-    creator = relationship("Trainer", back_populates="custom_exercises")
+    id = Column(UUID(as_uuid = True), primary_key = True, index = True, default = uuid.uuid4)
+    name = Column(String, index = True, nullable = False)
+    trainer_id = Column(UUID(as_uuid = True), ForeignKey("trainers.user_id"), index = True, nullable = False)
+    creator = relationship("Trainer", back_populates = "custom_exercises")
 
 
 class ExercisePlanEntry(Base):
     __tablename__ = "exercise_plan_entries"
-    id = Column(UUID(as_uuid=True), primary_key=True, index=True, default=uuid.uuid4)
+    id = Column(UUID(as_uuid = True), primary_key = True, index = True, default = uuid.uuid4)
     
-    exercise_plan_id = Column(UUID(as_uuid=True), ForeignKey("exercise_plans.id"), index=True, nullable=False) 
-    base_exercise_id = Column(UUID(as_uuid=True), ForeignKey("exercises.id"), index=True, nullable=False)
+    exercise_plan_id = Column(UUID(as_uuid = True), ForeignKey("exercise_plans.id"), index = True, nullable = False) 
+    base_exercise_id = Column(UUID(as_uuid = True), ForeignKey("exercises.id"), index = True, nullable = False)
     
-    sets = Column(Integer, nullable=False)            
-    repetitions = Column(String, nullable=False)         
-    day_of_week = Column(String, nullable=False)
-    order_in_session = Column(Integer, nullable=False) 
-    notes = Column(String, nullable=True) 
+    sets = Column(Integer, nullable = False)            
+    repetitions = Column(String, nullable = False)         
+    day_of_week = Column(String, nullable = False)
+    order_in_session = Column(Integer, nullable = False) 
+    notes = Column(String, nullable = True) 
     
-    exercise_plan = relationship("ExercisePlan", back_populates="exercise_entries")
+    exercise_plan = relationship("ExercisePlan", back_populates = "exercise_entries")
     base_exercise = relationship("Exercise")
 
 
 class ExercisePlan(Base):
     __tablename__ = "exercise_plans"
-    id = Column(UUID(as_uuid=True), primary_key=True, index=True, default=uuid.uuid4)
-    name = Column(String, index=True, nullable=False)
-    trainer_id = Column(UUID(as_uuid=True), ForeignKey("trainers.user_id"), index=True, nullable=False) 
+    id = Column(UUID(as_uuid = True), primary_key = True, index = True, default = uuid.uuid4)
+    name = Column(String, index = True, nullable = False)
+    trainer_id = Column(UUID(as_uuid = True), ForeignKey("trainers.user_id"), index = True, nullable = False) 
     
-    notes = Column(String, nullable=True) 
+    notes = Column(String, nullable = True) 
     
-    creator = relationship("Trainer", back_populates="exercise_plans_created")
-    assignments = relationship("ExercisePlanAssignment", back_populates="exercise_plan")
-    exercise_entries = relationship("ExercisePlanEntry", back_populates="exercise_plan")
+    creator = relationship("Trainer", back_populates = "exercise_plans_created")
+    assignments = relationship("ExercisePlanAssignment", back_populates = "exercise_plan")
+    exercise_entries = relationship("ExercisePlanEntry", back_populates = "exercise_plan")
 
 
 class ExercisePlanAssignment(Base):
     __tablename__ = "exercise_plan_assignments"
-    id = Column(UUID(as_uuid=True), primary_key=True, index=True, default=uuid.uuid4)
-    client_id = Column(UUID(as_uuid=True), ForeignKey("clients.user_id"), nullable=False, index=True)
-    exercise_plan_id = Column(UUID(as_uuid=True), ForeignKey("exercise_plans.id"), nullable=False, index=True)
-    client = relationship("Client", back_populates="exercise_assignments")
-    exercise_plan = relationship("ExercisePlan", back_populates="assignments")
+    id = Column(UUID(as_uuid = True), primary_key = True, index = True, default = uuid.uuid4)
+    client_id = Column(UUID(as_uuid = True), ForeignKey("clients.user_id"), nullable = False, index = True)
+    exercise_plan_id = Column(UUID(as_uuid = True), ForeignKey("exercise_plans.id"), nullable = False, index = True)
+    client = relationship("Client", back_populates = "exercise_assignments")
+    exercise_plan = relationship("ExercisePlan", back_populates = "assignments")

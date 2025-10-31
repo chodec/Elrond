@@ -22,13 +22,16 @@ def get_current_trainer_id() -> UUID:
 
 @router.get(
     "/tiers",
-    response_model=List[TrainerSubscriptionTier]
+    response_model = List[TrainerSubscriptionTier]
 )
 def get_all_tiers_for_trainer(
     trainer_id: UUID = Depends(get_current_trainer_id),
     db: Session = Depends(get_db),
 ):
-    tiers = crud_tiers.read_tiers_by_trainer_id(db, trainer_id=trainer_id)
+    tiers = crud_tiers.read_tiers_by_trainer_id(
+        db,
+         trainer_id = trainer_id
+    )
     
     if not tiers:
         return [] 
@@ -38,19 +41,22 @@ def get_all_tiers_for_trainer(
 
 @router.get(
     "/tier/{tier_id}",
-    response_model=TrainerSubscriptionTier
+    response_model = TrainerSubscriptionTier
 )
 def get_tier_by_id(
     tier_id: UUID,
     trainer_id: UUID = Depends(get_current_trainer_id),
     db: Session = Depends(get_db)
 ):
-    db_tier = crud_tiers.read_tier_by_id(db, tier_id=tier_id)
+    db_tier = crud_tiers.read_tier_by_id(
+        db,
+        tier_id = tier_id
+    )
 
-    if db_tier is None or db_tier.trainer_id != trainer_id:
+    if db_tier is None or db_tier.trainer_id !=  trainer_id:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Subscription Tier not found or access denied."
+            status_code = status.HTTP_404_NOT_FOUND,
+            detail = "Subscription Tier not found or access denied."
         )
     
     return db_tier
@@ -58,8 +64,8 @@ def get_tier_by_id(
 
 @router.post(
     "/tiers",
-    response_model=TrainerSubscriptionTier,
-    status_code=status.HTTP_201_CREATED
+    response_model = TrainerSubscriptionTier,
+    status_code = status.HTTP_201_CREATED
 )
 def create_tier(
     tier_data: TrainerSubscriptionTierCreate,
@@ -69,15 +75,15 @@ def create_tier(
     
     db_tier = crud_tiers.create_subscription_tier(
         db, 
-        tier_data=tier_data, 
-        trainer_id=trainer_id
+        tier_data = tier_data, 
+        trainer_id = trainer_id
     )
     return db_tier
 
 
 @router.patch(
     "/tier/{tier_id}",
-    response_model=TrainerSubscriptionTier
+    response_model = TrainerSubscriptionTier
 )
 def update_tier(
     tier_update: TrainerSubscriptionTierUpdate,
@@ -86,18 +92,21 @@ def update_tier(
     db: Session = Depends(get_db),
 ):
     
-    db_tier = crud_tiers.read_tier_by_id(db, tier_id)
+    db_tier = crud_tiers.read_tier_by_id(
+        db,
+         tier_id
+    )
 
-    if db_tier is None or db_tier.trainer_id != trainer_id:
+    if db_tier is None or db_tier.trainer_id !=  trainer_id:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Subscription Tier not found or access denied."
+            status_code = status.HTTP_404_NOT_FOUND,
+            detail = "Subscription Tier not found or access denied."
         )
 
     updated_tier = crud_tiers.update_subscription_tier(
         db, 
-        tier_id=tier_id, 
-        tier_update=tier_update
+        tier_id = tier_id, 
+        tier_update = tier_update
     )
     
     return updated_tier
@@ -105,7 +114,7 @@ def update_tier(
 
 @router.delete(
     "/tier/{tier_id}",
-    status_code=status.HTTP_204_NO_CONTENT
+    status_code = status.HTTP_204_NO_CONTENT
 )
 def delete_tier(
     tier_id: UUID,
@@ -113,14 +122,20 @@ def delete_tier(
     db: Session = Depends(get_db),
 ):
     
-    db_tier = crud_tiers.read_tier_by_id(db, tier_id)
+    db_tier = crud_tiers.read_tier_by_id(
+        db,
+        tier_id
+    )
 
-    if db_tier is None or db_tier.trainer_id != trainer_id:
+    if db_tier is None or db_tier.trainer_id !=  trainer_id:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Subscription Tier not found or access denied."
+            status_code = status.HTTP_404_NOT_FOUND,
+            detail = "Subscription Tier not found or access denied."
         )
 
-    crud_tiers.delete_subscription_tier(db, tier_id=tier_id)
+    crud_tiers.delete_subscription_tier(
+        db,
+        tier_id = tier_id
+    )
     
     return

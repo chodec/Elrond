@@ -16,25 +16,25 @@ def get_current_trainer_id() -> UUID:
 
 @router.post(
     "/meal_plan", 
-    response_model=MealPlanRead, 
-    status_code=status.HTTP_201_CREATED
+    response_model = MealPlanRead, 
+    status_code = status.HTTP_201_CREATED
 )
 def create_new_meal_plan(
     meal_plan_data: MealPlanCreate, 
     db: Session = Depends(get_db) 
 ):
     db_plan = create_meal_plan(
-        db=db,
-        meal_plan_name=meal_plan_data.name,
-        trainer_id=get_current_trainer_id(),
-        meal_entries_data=meal_plan_data.meal_entries
+        db = db,
+        meal_plan_name = meal_plan_data.name,
+        trainer_id = get_current_trainer_id(),
+        meal_entries_data = meal_plan_data.meal_entries
     )
     
     return db_plan
 
 @router.get(
     "/meal_plan/{meal_plan_id}",
-    response_model=MealPlanRead
+    response_model = MealPlanRead
 )
 def get_meal_plan_by_id(
     meal_plan_id:UUID,
@@ -42,22 +42,22 @@ def get_meal_plan_by_id(
 ):
 
     db_plan = read_meal_plan(
-        db=db,
-        trainer_id=get_current_trainer_id(),
-        meal_plan_id=meal_plan_id
+        db = db,
+        trainer_id = get_current_trainer_id(),
+        meal_plan_id = meal_plan_id
     )
 
     if db_plan is None:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Meal plan not found or access denied. Ensure the provided Meal Plan ID and Trainer ID are correct."
+            status_code = status.HTTP_404_NOT_FOUND,
+            detail = "Meal plan not found or access denied. Ensure the provided Meal Plan ID and Trainer ID are correct."
         )
     
     return db_plan
 
 @router.get(
     "/meal_plan/",
-    response_model=List[MealPlanRead]
+    response_model = List[MealPlanRead]
 )
 def get_all_meal_plans(
     search: Optional[str] = None, 
@@ -65,15 +65,15 @@ def get_all_meal_plans(
 ):
 
     db_plan = read_meal_all_plans(
-        db=db,
-        search=search,
-        trainer_id=get_current_trainer_id()
+        db = db,
+        search = search,
+        trainer_id = get_current_trainer_id()
     )
 
     if not db_plan:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Meal plans not found or access denied. Make sure to create meal plan."
+            status_code = status.HTTP_404_NOT_FOUND,
+            detail = "Meal plans not found or access denied. Make sure to create meal plan."
         )
     
     return db_plan

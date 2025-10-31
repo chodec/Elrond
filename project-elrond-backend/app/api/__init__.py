@@ -13,43 +13,43 @@ api_router = APIRouter()
 #trainer operations 
 api_router.include_router(
     meal_plan.router,
-    prefix="/trainer"
+    prefix = "/trainer"
     )
 
 api_router.include_router(
     meal.router,
-    prefix="/trainer"
+    prefix = "/trainer"
     )
 
 api_router.include_router(
     exercise.router,
-    prefix="/trainer"
+    prefix = "/trainer"
     )
 
 api_router.include_router(
     exercise_plan.router,
-    prefix="/trainer"
+    prefix = "/trainer"
     )
 
 api_router.include_router(
     subscription.router,
-    prefix="/trainer"
+    prefix = "/trainer"
     )
 
 #client operations
 api_router.include_router(
     measurement.router,
-    prefix="/client"
+    prefix = "/client"
     )
 
 #system
 api_router.include_router(
     health_check.router,
-    prefix="/system"
+    prefix = "/system"
     )
 
 #auth
 api_router.include_router(
     register.router, 
-    prefix="/auth"
+    prefix = "/auth"
 )

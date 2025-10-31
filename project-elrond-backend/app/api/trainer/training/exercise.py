@@ -16,8 +16,8 @@ def get_current_trainer_id() -> UUID:
 
 @router.post(
     "/exercise", 
-    response_model=ExerciseRead,
-    status_code=status.HTTP_201_CREATED
+    response_model = ExerciseRead,
+    status_code = status.HTTP_201_CREATED
 )
 def create_new_exercise(
     data: ExerciseCreate,
@@ -28,57 +28,57 @@ def create_new_exercise(
         print(get_current_trainer_id())
         new_exercise = create_exercise(
             db, 
-            exercise_name=data.name, 
-            trainer_id=get_current_trainer_id()
+            exercise_name = data.name, 
+            trainer_id = get_current_trainer_id()
         )
     except Exception as e:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Creating exercise failed."
+            status_code = status.HTTP_400_BAD_REQUEST,
+            detail = "Creating exercise failed."
         )
 
     return new_exercise
 
 @router.get(
     "/exercise/{exercise_id}",
-    response_model=ExerciseRead
+    response_model = ExerciseRead
 )
 def get_exercise_by_id(
     exercise_id: UUID,
     db: Session = Depends(get_db)
 ):
     db_plan = read_exercise(
-        db=db,
-        exercise_id=exercise_id,
-        trainer_id=get_current_trainer_id()
+        db = db,
+        exercise_id = exercise_id,
+        trainer_id = get_current_trainer_id()
     )
 
     if db_plan is None:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Exercise not found or access denied. Ensure the provided Exercise Plan ID and Trainer ID are correct."
+            status_code = status.HTTP_404_NOT_FOUND,
+            detail = "Exercise not found or access denied. Ensure the provided Exercise Plan ID and Trainer ID are correct."
         )
     
     return db_plan
 
 @router.get(
     "/exercise/",
-    response_model=List[ExerciseRead]
+    response_model = List[ExerciseRead]
 )
 def get_all_exercises(
     search: Optional[str] = None, 
     db: Session = Depends(get_db)
 ):
     db_exercise = read_all_exercises(
-        db=db,
-        search=search,
-        trainer_id=get_current_trainer_id()
+        db = db,
+        search = search,
+        trainer_id = get_current_trainer_id()
     )
 
     if not db_exercise:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Exercises not found or access denied. Make sure to create exercise plan."
+            status_code = status.HTTP_404_NOT_FOUND,
+            detail = "Exercises not found or access denied. Make sure to create exercise plan."
         )
     
     return db_exercise

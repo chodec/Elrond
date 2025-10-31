@@ -14,24 +14,24 @@ def create_meal_plan(
 ) -> MealPlan: 
     
     db_meal_plan = MealPlan(
-        name=meal_plan_name,
-        trainer_id=trainer_id
+        name = meal_plan_name,
+        trainer_id = trainer_id
     )
     db.add(db_meal_plan)
     db.flush()
     
     for entry_data in meal_entries_data:
         db_entry = MealPlanEntry(
-            meal_plan_id=db_meal_plan.id,
+            meal_plan_id = db_meal_plan.id,
             
-            base_meal_id=entry_data.base_meal_id,
-            serving_size_grams=entry_data.serving_size_grams,
-            time_slot=entry_data.time_slot,
+            base_meal_id = entry_data.base_meal_id,
+            serving_size_grams = entry_data.serving_size_grams,
+            time_slot = entry_data.time_slot,
             notes=entry_data.notes,
             
-            carbohydrates_g=entry_data.carbohydrates_g,
-            fat_g=entry_data.fat_g,
-            protein_g=entry_data.protein_g
+            carbohydrates_g = entry_data.carbohydrates_g,
+            fat_g = entry_data.fat_g,
+            protein_g = entry_data.protein_g
         )
         db.add(db_entry)
         

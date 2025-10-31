@@ -85,7 +85,7 @@ def get_measurement_by_id(
 
 @router.patch(
     "/measurement/{measurement_id}",
-    response_model=ClientMeasurement
+    response_model = ClientMeasurement
 )
 def update_measurement(
     measurement_update: ClientMeasurementUpdate,
@@ -100,25 +100,25 @@ def update_measurement(
 
     if db_measurement is None:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Measurement not found or access denied."
+            status_code = status.HTTP_404_NOT_FOUND,
+            detail = "Measurement not found or access denied."
         )
 
     updated_measurement = crud_metrics.update_client_measurement(
         db, 
-        measurement_id=measurement_id, 
-        measurement_update=measurement_update
+        measurement_id = measurement_id, 
+        measurement_update = measurement_update
     )
     
     return updated_measurement
 
 @router.delete(
     "/measurement/{measurement_id}",
-    status_code=status.HTTP_204_NO_CONTENT
+    status_code = status.HTTP_204_NO_CONTENT
 )
 def delete_measurement(
     measurement_id: UUID,
-    db: Session = Depends(get_db),
+    db: Session = Depends(get_db)
 ):
     
     db_measurement = crud_metrics.read_measurement_by_id(
@@ -128,10 +128,13 @@ def delete_measurement(
 
     if db_measurement is None:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Measurement not found or access denied."
+            status_code = status.HTTP_404_NOT_FOUND,
+            detail = "Measurement not found or access denied."
         )
 
-    crud_metrics.delete_client_measurement(db, measurement_id=measurement_id)
+    crud_metrics.delete_client_measurement(
+        db,
+        measurement_id=measurement_id
+    )
     
     return
