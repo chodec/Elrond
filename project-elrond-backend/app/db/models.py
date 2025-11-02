@@ -118,6 +118,36 @@ class ClientTrainerAssociation(Base):
     specialization_type = Column(String, nullable = True)
     __table_args__ = (UniqueConstraint('client_id', 'trainer_id', name = 'uq_client_trainer_pair'),)
 
+# Iniatial relationship betweeen client and trainer
+# Client choose and contant trainer via this table
+class ClientTrainerRequest(Base):
+    __tablename__ = "client_trainer_requests"
+    
+    id = Column(UUID(as_uuid=True), primary_key=True, index=True, default=uuid.uuid4)
+    
+    # Who asking who
+    client_id = Column(UUID(as_uuid=True), ForeignKey("clients.user_id"), nullable=False)
+    trainer_id = Column(UUID(as_uuid=True), ForeignKey("trainers.user_id"), nullable=False)
+    
+    status = Column(request_status_enum, default=RequestStatus.PENDING, nullable=False)
+    client_initial_notes = Column(String, nullable=True) # Welcome message
+    
+    # Last edit
+    resolved_by_user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=True)
+    resolution_notes = Column(String, nullable=True)     # Feedback message
+    
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    
+    # Anti spam
+    __table_args__ = (
+        UniqueConstraint('client_id', 'trainer_id', name='uq_one_active_request_per_pair'),
+    )
+
+    client = relationship("Client", foreign_keys=[client_id])
+    trainer = relationship("Trainer", foreign_keys=[trainer_id])
+    resolver = relationship("User", foreign_keys=[resolved_by_user_id])
+
 # Trainer Meals
 # Flow: 
 # 1. Trainer creates meal
