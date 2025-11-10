@@ -3,7 +3,8 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy import or_
 from typing import Optional, List, Literal
 from uuid import UUID
-from app.db.models import ClientTrainerRequest, RequestStatus 
+from app.db.models import ClientTrainerRequest, RequestStatus
+from app.crud.trainer_operations.request.association import create_association 
 
 def get_request_by_id(db: Session, request_id: UUID) -> Optional[ClientTrainerRequest]:
     return db.query(ClientTrainerRequest).filter(ClientTrainerRequest.id == request_id).first()
@@ -101,10 +102,21 @@ def trainer_resolve_request(
     if not request or request.trainer_id != trainer_id or request.status != RequestStatus.PENDING:
         return None
         
-    return update_request_status(
+    updated_request = update_request_status(
         db, 
         request, 
         new_status, 
         resolver_id=trainer_id, 
         resolution_notes=notes
     )
+
+    if new_status == RequestStatus.ACCEPTED:
+
+        try:
+            create_association(db, updated_request.client_id, trainer_id)
+            db.commit() 
+        except IntegrityError:
+            db.rollback()
+            return None 
+        
+    return updated_request
