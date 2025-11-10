@@ -139,10 +139,10 @@ class ClientTrainerRequest(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     
-    # Anti spam
-    __table_args__ = (
-        UniqueConstraint('client_id', 'trainer_id', name='uq_one_active_request_per_pair'),
-    )
+    # Anti spam -> HOPEFULLY    q ON BACKEND
+    #__table_args__ = (
+    #    UniqueConstraint('client_id', 'trainer_id', name='uq_one_active_request_per_pair'),
+    #)
 
     client = relationship("Client", foreign_keys=[client_id])
     trainer = relationship("Trainer", foreign_keys=[trainer_id])

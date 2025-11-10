@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import or_
-from typing import Optional, List
+from typing import Optional, List, Literal
 from uuid import UUID
 from app.db.models import ClientTrainerRequest, RequestStatus 
 
@@ -26,8 +26,17 @@ def create_request(
     client_id: UUID, 
     trainer_id: UUID, 
     client_notes: Optional[str] = None
-) -> Optional[ClientTrainerRequest]:
+) -> ClientTrainerRequest | Literal[False] | None:
 
+    existing_pending_request = db.query(ClientTrainerRequest).filter(
+        ClientTrainerRequest.client_id == client_id,
+        ClientTrainerRequest.trainer_id == trainer_id,
+        ClientTrainerRequest.status == RequestStatus.PENDING 
+    ).first()
+
+    if existing_pending_request:
+        return False 
+    
     db_request = ClientTrainerRequest(
         client_id=client_id,
         trainer_id=trainer_id,

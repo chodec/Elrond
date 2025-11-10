@@ -34,14 +34,23 @@ def submit_new_trainer_request(
             trainer_id=request_data.trainer_id,
             client_notes=request_data.client_initial_notes
         )
-        
-        if db_request is None:
+
+        if db_request is False:
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
-                detail="Request exists"
+                detail="You already have an open (pending) request for this trainer. Please finish or cancel the previous one."
+        )
+
+        if db_request is None:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="The request could not be saved due to an internal server error."
             )
         
         return db_request
+    
+    except HTTPException as e:
+        raise e
     
     except Exception as e:
        print(e)
