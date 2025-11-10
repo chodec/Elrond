@@ -139,3 +139,25 @@ def delete_tier(
     )
     
     return
+
+
+@router.get(
+    "/{trainer_id}/subscriptions",
+    response_model=List[TrainerSubscriptionTier]
+)
+def get_tiers_for_public_view(
+    trainer_id: UUID,
+    db: Session = Depends(get_db),
+):
+    
+    all_tiers = crud_tiers.read_tiers_by_trainer_id(
+        db, 
+        trainer_id=trainer_id
+    )
+    
+    active_tiers = [tier for tier in all_tiers if tier.is_active]
+
+    if not active_tiers:
+        return [] 
+    
+    return active_tiers
