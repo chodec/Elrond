@@ -93,6 +93,7 @@ class Client(Base):
     meal_assignments = relationship("MealPlanAssignment", back_populates = "client")
     exercise_assignments = relationship("ExercisePlanAssignment", back_populates = "client")
     measurements = relationship("ClientMeasurement", back_populates = "client")
+    subscriptions = relationship("ClientSubscription", back_populates = "client")
 
 class ClientMeasurement(Base):
     __tablename__ = "client_measurements"
@@ -139,7 +140,7 @@ class ClientTrainerRequest(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     
-    # Anti spam -> HOPEFULLY    q ON BACKEND
+    # Anti spam -> ON BACKEND
     #__table_args__ = (
     #    UniqueConstraint('client_id', 'trainer_id', name='uq_one_active_request_per_pair'),
     #)
@@ -147,6 +148,24 @@ class ClientTrainerRequest(Base):
     client = relationship("Client", foreign_keys=[client_id])
     trainer = relationship("Trainer", foreign_keys=[trainer_id])
     resolver = relationship("User", foreign_keys=[resolved_by_user_id])
+
+class ClientSubscription(Base):
+    __tablename__ = "client_subscriptions"
+    id = Column(UUID(as_uuid=True), primary_key=True, index=True, default=uuid.uuid4)
+    
+    client_id = Column(UUID(as_uuid=True), ForeignKey("clients.user_id"), nullable=False, index=True)
+    trainer_id = Column(UUID(as_uuid=True), ForeignKey("trainers.user_id"), nullable=False, index=True)
+    tier_id = Column(UUID(as_uuid=True), ForeignKey("trainer_subscription_tiers.id"), nullable=False, index=True)
+    
+    start_date = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    end_date = Column(DateTime(timezone=True), nullable=False) # expiration
+    
+    # payment status
+    status = Column(payment_status_enum, nullable=False) 
+    
+    client = relationship("Client", foreign_keys=[client_id], back_populates="subscriptions")
+    trainer = relationship("Trainer", foreign_keys=[trainer_id])
+    tier = relationship("TrainerSubscriptionTier")
 
 # Trainer Meals
 # Flow: 

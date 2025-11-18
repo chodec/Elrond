@@ -7,7 +7,7 @@ from typing import List
 from app.db.database import get_db 
 from app.schemas.client_trainer_request import RequestCreate, RequestRead
 from app.crud.trainer_operations.request.client_trainer_requests import create_request, client_cancel_request, get_client_requests
-from app.db.models import RequestStatus 
+
 
 def get_current_client_id() -> UUID:
     # TODO auth

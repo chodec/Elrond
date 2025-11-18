@@ -66,7 +66,7 @@ def delete_subscription_tier(db: Session, tier_id: UUID) -> Optional[UUID]:
         return tier_id
     return None
 
-#for client
+#CRUD methods for clients
 def read_tiers_by_trainer_id(
     db: Session, 
     trainer_id: UUID,
@@ -74,3 +74,13 @@ def read_tiers_by_trainer_id(
     return db.query(TrainerSubscriptionTier).filter(
         TrainerSubscriptionTier.trainer_id == trainer_id
     ).order_by(TrainerSubscriptionTier.is_active.desc(), TrainerSubscriptionTier.price_monthly.asc()).all()
+
+def get_tier_by_id_and_trainer(
+    db: Session, 
+    tier_id: UUID, 
+    trainer_id: UUID
+) -> Optional[TrainerSubscriptionTier]:
+    return db.query(TrainerSubscriptionTier).filter(
+        TrainerSubscriptionTier.id == tier_id,
+        TrainerSubscriptionTier.trainer_id == trainer_id
+    ).first()

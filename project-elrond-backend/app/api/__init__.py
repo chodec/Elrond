@@ -6,6 +6,7 @@ from .trainer.training import exercise_plan
 from .trainer.subscription import subscription
 from .trainer.requests import client_trainer_requests
 from .client import measurement
+from .client import subscription as client_subscriptions
 from .client import client_trainer_requests as client_requests
 from .system import health_check
 from .auth import register
@@ -52,6 +53,12 @@ api_router.include_router(
     client_requests.router,
     prefix = "/client"
 )
+
+api_router.include_router(
+    client_subscriptions.router,
+    prefix = "/client"
+)
+
 
 #system
 api_router.include_router(
