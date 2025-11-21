@@ -5,6 +5,7 @@ from .trainer.training import exercise
 from .trainer.training import exercise_plan
 from .trainer.subscription import subscription
 from .trainer.requests import client_trainer_requests
+from .trainer.assignment import assigment
 from .client import measurement
 from .client import subscription as client_subscriptions
 from .client import client_trainer_requests as client_requests
@@ -38,8 +39,14 @@ api_router.include_router(
     subscription.router,
     prefix = "/trainer"
     )
+
 api_router.include_router(
     client_trainer_requests.router, 
+    prefix = "/trainer"
+)
+
+api_router.include_router(
+    assigment.router, 
     prefix = "/trainer"
 )
 
