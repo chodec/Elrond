@@ -7,6 +7,7 @@ from .trainer.subscription import subscription
 from .trainer.requests import client_trainer_requests
 from .trainer.assignment import assigment
 from .client import measurement
+from .client import assignment
 from .client import subscription as client_subscriptions
 from .client import client_trainer_requests as client_requests
 from .system import health_check
@@ -66,6 +67,10 @@ api_router.include_router(
     prefix = "/client"
 )
 
+api_router.include_router(
+    assignment.router,
+    prefix = "/client"
+)
 
 #system
 api_router.include_router(
