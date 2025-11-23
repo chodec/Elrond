@@ -19,7 +19,8 @@ def get_current_trainer_id() -> UUID:
 @router.post(
     "/meal", 
     response_model = MealSchema,
-    status_code = status.HTTP_201_CREATED
+    status_code = status.HTTP_201_CREATED,
+    description="Create meal -> nutri score is specified in the meal plan"
 )
 def create_new_meal(
     data: MealCreate, 
@@ -36,7 +37,8 @@ def create_new_meal(
 
 @router.get(
     "/meal/{meal_id}",
-    response_model = MealSchema
+    response_model = MealSchema,
+    description="Get specific meal by ID"
 )
 def get_meal_by_id(
     meal_id: UUID,
@@ -58,7 +60,8 @@ def get_meal_by_id(
 
 @router.get(
     "/meal/",
-    response_model = List[MealSchema]
+    response_model = List[MealSchema],
+    description="Get all meals"
 )
 def get_all_meals(
     search: Optional[str] = None, 

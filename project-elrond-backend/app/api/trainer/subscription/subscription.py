@@ -22,7 +22,8 @@ def get_current_trainer_id() -> UUID:
 
 @router.get(
     "/tiers",
-    response_model = List[TrainerSubscriptionTier]
+    response_model = List[TrainerSubscriptionTier],
+    descriptions="Get all tiers (types of subscriptions) created by trainer"
 )
 def get_all_tiers_for_trainer(
     trainer_id: UUID = Depends(get_current_trainer_id),
@@ -41,7 +42,8 @@ def get_all_tiers_for_trainer(
 
 @router.get(
     "/tier/{tier_id}",
-    response_model = TrainerSubscriptionTier
+    response_model = TrainerSubscriptionTier,
+    description="Get specific subscription by ID"
 )
 def get_tier_by_id(
     tier_id: UUID,
@@ -65,7 +67,8 @@ def get_tier_by_id(
 @router.post(
     "/tiers",
     response_model = TrainerSubscriptionTier,
-    status_code = status.HTTP_201_CREATED
+    status_code = status.HTTP_201_CREATED,
+    description="Create trainer type of subscriptions for his clients"
 )
 def create_tier(
     tier_data: TrainerSubscriptionTierCreate,
@@ -83,7 +86,8 @@ def create_tier(
 
 @router.patch(
     "/tier/{tier_id}",
-    response_model = TrainerSubscriptionTier
+    response_model = TrainerSubscriptionTier,
+    description="Get specific subscription by ID"
 )
 def update_tier(
     tier_update: TrainerSubscriptionTierUpdate,
@@ -114,7 +118,8 @@ def update_tier(
 
 @router.delete(
     "/tier/{tier_id}",
-    status_code = status.HTTP_204_NO_CONTENT
+    status_code = status.HTTP_204_NO_CONTENT,
+    description="Delete specific subscription by ID"
 )
 def delete_tier(
     tier_id: UUID,
@@ -143,7 +148,8 @@ def delete_tier(
 
 @router.get(
     "/{trainer_id}/subscriptions",
-    response_model=List[TrainerSubscriptionTier]
+    response_model=List[TrainerSubscriptionTier],
+    description="Get specific subscription by trainer ID for client"
 )
 def get_tiers_for_public_view(
     trainer_id: UUID,

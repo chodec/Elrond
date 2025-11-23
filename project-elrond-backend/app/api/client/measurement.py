@@ -21,7 +21,8 @@ def get_current_client_id() -> UUID:
 
 @router.get(
     "/measurement",
-    response_model=PaginatedMeasurementResponse[ClientMeasurement] 
+    response_model=PaginatedMeasurementResponse[ClientMeasurement],
+    description="Get all (10 is default page) client measurement"
 )
 def get_measurements(
     db: Session = Depends(get_db),
@@ -50,7 +51,8 @@ def get_measurements(
 @router.post(
     "/measurement",
     response_model=ClientMeasurement,
-    status_code = status.HTTP_201_CREATED
+    status_code = status.HTTP_201_CREATED,
+    description="Create own measurement"
 )
 def create_measurement(
     measurement_data: ClientMeasurementCreate,
@@ -66,7 +68,8 @@ def create_measurement(
 
 @router.get(
     "/measurement/{measurement_id}",
-    response_model=ClientMeasurement
+    response_model=ClientMeasurement,
+    description="Get specific measurement by id"
 )
 def get_measurement_by_id(
     measurement_id: UUID,
@@ -85,7 +88,8 @@ def get_measurement_by_id(
 
 @router.patch(
     "/measurement/{measurement_id}",
-    response_model = ClientMeasurement
+    response_model = ClientMeasurement,
+    description="Edit specific measurement by id"
 )
 def update_measurement(
     measurement_update: ClientMeasurementUpdate,
@@ -114,7 +118,8 @@ def update_measurement(
 
 @router.delete(
     "/measurement/{measurement_id}",
-    status_code = status.HTTP_204_NO_CONTENT
+    status_code = status.HTTP_204_NO_CONTENT,
+    description="Delete specific measurement by id"
 )
 def delete_measurement(
     measurement_id: UUID,

@@ -1,5 +1,3 @@
-# app/api/endpoints/assignments.py
-
 from fastapi import APIRouter, Depends, status, HTTPException
 from sqlalchemy.orm import Session
 from uuid import UUID
@@ -25,7 +23,8 @@ router = APIRouter()
 
 @router.post(
     "/assignments/meal-plan", 
-    status_code=status.HTTP_201_CREATED
+    status_code=status.HTTP_201_CREATED,
+    description="Assign meal plan to the subscribed client"
 )
 def assign_meal_plan_to_client(
     assignment_data: AssignmentCreate,
@@ -63,7 +62,8 @@ def assign_meal_plan_to_client(
 
 @router.post(
     "/assignments/exercise-plan", 
-    status_code=status.HTTP_201_CREATED
+    status_code=status.HTTP_201_CREATED,
+    description="Assign exercise plan to the subscribed client"
 )
 def assign_exercise_plan_to_client(
     assignment_data: AssignmentCreate,

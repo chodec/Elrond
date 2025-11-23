@@ -1,5 +1,3 @@
-# app/api/endpoints/client_plans.py
-
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 from typing import List
@@ -22,7 +20,8 @@ router = APIRouter()
 
 @router.get(
     "/assignments/meal-plans",
-    response_model = List[MealPlanRead]
+    response_model = List[MealPlanRead],
+    description="Get user meal plans, which trainer assigned to him"
 )
 def get_my_meal_plans(
     client_id: UUID = Depends(get_current_client_id),
@@ -41,7 +40,8 @@ def get_my_meal_plans(
 
 @router.get(
     "/assignments/exercise-plans",
-    response_model = List[ExercisePlanRead]
+    response_model = List[ExercisePlanRead],
+    description="Get user exercise plans, which trainer assigned to him"
 )
 def get_my_exercise_plans(
     client_id: UUID = Depends(get_current_client_id),

@@ -21,7 +21,8 @@ def get_current_client_id() -> UUID:
 @router.get(
     "/subscriptions",
     response_model=List[ClientSubscriptionRead],
-    status_code=status.HTTP_200_OK
+    status_code=status.HTTP_200_OK,
+    description="Get all active client subscription"
 )
 def get_all_client_subscriptions(
     db: Session = Depends(get_db)
@@ -38,7 +39,8 @@ def get_all_client_subscriptions(
 @router.post(
     "/subscriptions/buy",
     response_model=ClientSubscriptionRead,
-    status_code=status.HTTP_201_CREATED
+    status_code=status.HTTP_201_CREATED,
+    description="Mock payment -> will be replaced with STRIPE"
 )
 def buy_subscription(
     purchase_data: ClientSubscriptionCreate,
@@ -77,7 +79,7 @@ def buy_subscription(
 
     if db_subscription is None:
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+            status_code=status.HTTP_500_INTERNAL_SvERVER_ERROR
         )
         
     # TODO: Trainer notification

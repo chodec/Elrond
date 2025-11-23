@@ -17,7 +17,8 @@ def get_current_trainer_id() -> UUID:
 
 @router.get(
     "/requests/pending",
-    response_model=List[RequestRead]
+    response_model=List[RequestRead],
+    description="Check any pending requests from clients"
 )
 def get_all_pending_requests(
     db: Session = Depends(get_db)
@@ -34,7 +35,8 @@ def get_all_pending_requests(
 
 @router.patch(
     "/request/{request_id}/approve",
-    response_model=RequestRead
+    response_model=RequestRead,
+    description="Approve request from the cliend -> he will be asked for money"
 )
 def approve_client_request(
     request_id: UUID,
@@ -60,7 +62,8 @@ def approve_client_request(
 
 @router.patch(
     "/request/{request_id}/reject",
-    response_model=RequestRead
+    response_model=RequestRead,
+    description="Reject client relationship request -> you might not want another clients"
 )
 def reject_client_request(
     request_id: UUID,

@@ -17,7 +17,8 @@ def get_current_trainer_id() -> UUID:
 @router.post(
     "/exercise", 
     response_model = ExerciseRead,
-    status_code = status.HTTP_201_CREATED
+    status_code = status.HTTP_201_CREATED,
+    description="Create exercesi for exercise plans -> sets etc. will be specified in the exercise plans"
 )
 def create_new_exercise(
     data: ExerciseCreate,
@@ -41,7 +42,8 @@ def create_new_exercise(
 
 @router.get(
     "/exercise/{exercise_id}",
-    response_model = ExerciseRead
+    response_model = ExerciseRead,
+    description="Get specific exercise by ID"
 )
 def get_exercise_by_id(
     exercise_id: UUID,
@@ -63,7 +65,8 @@ def get_exercise_by_id(
 
 @router.get(
     "/exercise/",
-    response_model = List[ExerciseRead]
+    response_model = List[ExerciseRead],
+    desription="Get all exercise"
 )
 def get_all_exercises(
     search: Optional[str] = None, 

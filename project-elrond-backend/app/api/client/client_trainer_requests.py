@@ -18,7 +18,9 @@ router = APIRouter()
 @router.post(
     "/request", 
     response_model=RequestRead, 
-    status_code=status.HTTP_201_CREATED
+    status_code=status.HTTP_201_CREATED,
+    description="Initiate relationship with trainer -> " \
+        "trainer might do not want new clients, spam protection"
 )
 def submit_new_trainer_request(
     request_data: RequestCreate,
@@ -61,7 +63,8 @@ def submit_new_trainer_request(
 
 @router.patch(
     "/request/{request_id}/cancel",
-    response_model=RequestRead
+    response_model=RequestRead,
+    description="Cancel initiated relationship with trainer"
 )
 def cancel_own_trainer_request(
     request_id: UUID,
@@ -85,7 +88,8 @@ def cancel_own_trainer_request(
     
 @router.get(
     "/requests/",
-    response_model=List[RequestRead]
+    response_model=List[RequestRead],
+    description="Get all initial relationships with trainers"
 )
 def get_all_client_requests(
     db: Session = Depends(get_db)

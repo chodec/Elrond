@@ -10,7 +10,8 @@ router = APIRouter(tags=["Auth"])
 @router.post(
     "/register", 
     response_model=UserSchema,
-    status_code=status.HTTP_201_CREATED
+    status_code=status.HTTP_201_CREATED,
+    description="Create account"
 )
 def register_user(
     data: UserInitialCreate, 
@@ -30,7 +31,8 @@ def register_user(
 
 @router.post(
         "/onboard",
-        status_code=status.HTTP_200_OK
+        status_code=status.HTTP_200_OK,
+        description="User specify if he is client or trainer"
 )
 def onboard_user_profile(
     role_choice: RoleUpgrade,
