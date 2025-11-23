@@ -66,7 +66,7 @@ def get_exercise_by_id(
 @router.get(
     "/exercise/",
     response_model = List[ExerciseRead],
-    desription="Get all exercise"
+    description="Get all exercise"
 )
 def get_all_exercises(
     search: Optional[str] = None, 

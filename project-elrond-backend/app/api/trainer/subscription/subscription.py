@@ -23,7 +23,7 @@ def get_current_trainer_id() -> UUID:
 @router.get(
     "/tiers",
     response_model = List[TrainerSubscriptionTier],
-    descriptions="Get all tiers (types of subscriptions) created by trainer"
+    description="Get all tiers (types of subscriptions) created by trainer"
 )
 def get_all_tiers_for_trainer(
     trainer_id: UUID = Depends(get_current_trainer_id),
