@@ -12,6 +12,13 @@ class MealPlanEntryCreate(BaseModel):
     fat_g: int          
     protein_g: int
 
+class MealPlanEntryUpdate(MealPlanEntryCreate):
+    pass
+
+class MealPlanUpdate(BaseModel):
+    name: str
+    meal_entries: List[MealPlanEntryUpdate] 
+
 class MealPlanCreate(BaseModel):
     name: str
     meal_entries: List[MealPlanEntryCreate] 

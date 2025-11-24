@@ -6,8 +6,14 @@ import os
 from dotenv import load_dotenv
 from app.db.database import get_db 
 from app.db.models import Meal 
-from app.schemas.meal import MealCreate, Meal as MealSchema
-from app.crud.trainer_operations.meal.meals import create_meal, read_meal, read_all_meals
+from app.schemas.meal import MealCreate, Meal as MealSchema, MealUpdate
+from app.crud.trainer_operations.meal.meals import (
+    create_meal,
+    read_meal,
+    read_all_meals,
+    update_meal,
+    delete_meal
+)
 
 
 router = APIRouter()
@@ -80,3 +86,65 @@ def get_all_meals(
         )
     
     return db_plans
+
+@router.put(
+    "/meal/{meal_id}",
+    response_model = MealSchema,
+    description="Update an existing meal."
+)
+def update_existing_meal(
+    meal_id: UUID,
+    data: MealUpdate,
+    db: Session = Depends(get_db)
+):
+    try:
+        updated_meal = update_meal(
+            db = db,
+            meal_id = meal_id,
+            trainer_id = get_current_trainer_id(),
+            data = data
+        )
+
+        if updated_meal is None:
+            raise HTTPException(
+                status_code = status.HTTP_404_NOT_FOUND,
+                detail = "Meal not found or access denied."
+            )
+
+        return updated_meal
+
+    except Exception:
+        raise HTTPException(
+            status_code = status.HTTP_400_BAD_REQUEST,
+            detail = "Could not update meal."
+        )
+
+@router.delete(
+    "/meal/{meal_id}",
+    status_code = status.HTTP_204_NO_CONTENT,
+    description="Delete an existing meal."
+)
+def delete_existing_meal(
+    meal_id: UUID,
+    db: Session = Depends(get_db)
+):
+    try:
+        is_deleted = delete_meal(
+            db = db,
+            meal_id = meal_id,
+            trainer_id = get_current_trainer_id()
+        )
+
+        if not is_deleted:
+            raise HTTPException(
+                status_code = status.HTTP_404_NOT_FOUND,
+                detail = "Meal not found or access denied."
+            )
+            
+        return
+
+    except Exception:
+        raise HTTPException(
+            status_code = status.HTTP_409_CONFLICT,
+            detail = "Cannot delete meal. It is currently referenced by one or more meal plans."
+        )

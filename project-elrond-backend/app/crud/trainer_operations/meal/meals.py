@@ -1,8 +1,9 @@
 from sqlalchemy.orm import Session
-from sqlalchemy import select
+from sqlalchemy import select, delete
 from uuid import UUID
 from typing import Optional, List
 from app.db.models import Meal
+from app.schemas.meal import MealUpdate
 
 def create_meal(db: Session, meal_name: str, trainer_id: UUID) -> Meal:
     
@@ -51,3 +52,38 @@ def read_all_meals(
     db_meals = db.scalars(statement).all()
     
     return db_meals
+
+def update_meal(
+        db: Session,
+        meal_id: UUID,
+        trainer_id: UUID,
+        data: MealUpdate
+) -> Optional[Meal]:
+    
+    db_meal = read_meal(db, meal_id, trainer_id)
+    
+    if not db_meal:
+        return None
+
+    db_meal.name = data.name
+    
+    db.commit()
+    db.refresh(db_meal)
+    
+    return db_meal
+
+def delete_meal(
+        db: Session,
+        meal_id: UUID,
+        trainer_id: UUID
+) -> bool:
+    
+    db_meal = read_meal(db, meal_id, trainer_id)
+    
+    if not db_meal:
+        return False
+    
+    db.delete(db_meal)
+    db.commit()
+    
+    return True
