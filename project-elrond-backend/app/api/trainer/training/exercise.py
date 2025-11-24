@@ -5,8 +5,14 @@ from dotenv import load_dotenv
 from typing import List, Optional
 from uuid import UUID
 from app.db.database import get_db 
-from app.schemas.exercise import ExerciseRead, ExerciseCreate
-from app.crud.trainer_operations.training.exercises import create_exercise, read_exercise, read_all_exercises
+from app.schemas.exercise import ExerciseRead, ExerciseCreate, ExerciseUpdate
+from app.crud.trainer_operations.training.exercises import (
+    create_exercise,
+    read_exercise,
+    read_all_exercises,
+    update_exercise, 
+    delete_exercise
+)
 
 router = APIRouter()
 
@@ -85,3 +91,65 @@ def get_all_exercises(
         )
     
     return db_exercise
+
+@router.put(
+    "/exercise/{exercise_id}",
+    response_model = ExerciseRead,
+    description="Update an existing exercise."
+)
+def update_existing_exercise(
+    exercise_id: UUID,
+    data: ExerciseUpdate,
+    db: Session = Depends(get_db)
+):
+    try:
+        updated_exercise = update_exercise(
+            db = db,
+            exercise_id = exercise_id,
+            trainer_id = get_current_trainer_id(),
+            data = data
+        )
+
+        if updated_exercise is None:
+            raise HTTPException(
+                status_code = status.HTTP_404_NOT_FOUND,
+                detail = "Exercise not found or access denied."
+            )
+
+        return updated_exercise
+
+    except Exception:
+        raise HTTPException(
+            status_code = status.HTTP_400_BAD_REQUEST,
+            detail = "Could not update exercise. Check if the exercise is not currently used in an active plan."
+        )
+
+@router.delete(
+    "/exercise/{exercise_id}",
+    status_code = status.HTTP_204_NO_CONTENT,
+    description="Delete an existing exercise."
+)
+def delete_existing_exercise(
+    exercise_id: UUID,
+    db: Session = Depends(get_db)
+):
+    try:
+        is_deleted = delete_exercise(
+            db = db,
+            exercise_id = exercise_id,
+            trainer_id = get_current_trainer_id()
+        )
+
+        if not is_deleted:
+            raise HTTPException(
+                status_code = status.HTTP_404_NOT_FOUND,
+                detail = "Exercise not found or access denied."
+            )
+            
+        return
+
+    except Exception:
+        raise HTTPException(
+            status_code = status.HTTP_409_CONFLICT, 
+            detail = "Cannot delete exercise. It is currently referenced by one or more exercise plans."
+        )
