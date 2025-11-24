@@ -13,6 +13,16 @@ class ExercisePlanEntryCreate(BaseModel):
     
     notes: Optional[str] = None 
 
+class ExercisePlanEntryUpdate(ExercisePlanEntryCreate):
+    pass
+
+class ExercisePlanUpdate(BaseModel):
+    name: str
+    
+    notes: Optional[str] = None 
+    
+    exercise_entries: List[ExercisePlanEntryUpdate] 
+
 class ExercisePlanCreate(BaseModel):
     name: str
     

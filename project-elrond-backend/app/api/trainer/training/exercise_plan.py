@@ -5,8 +5,14 @@ import os
 from dotenv import load_dotenv
 from uuid import UUID
 from app.db.database import get_db 
-from app.schemas.exercise_plan import ExercisePlanCreate, ExercisePlanRead
-from app.crud.trainer_operations.training.exercise_plans import create_exercise_plan, read_all_exercise_plans, read_exercise_plan
+from app.schemas.exercise_plan import ExercisePlanCreate, ExercisePlanRead, ExercisePlanUpdate
+from app.crud.trainer_operations.training.exercise_plans import (
+    create_exercise_plan, 
+    read_all_exercise_plans, 
+    read_exercise_plan,
+    update_exercise_plan,
+    delete_exercise_plan
+)
 
 router = APIRouter()
 
@@ -39,7 +45,7 @@ def create_new_exercise_plan(
     except Exception as e:
         raise HTTPException(
             status_code = status.HTTP_400_BAD_REQUEST,
-            detail = "Could not create training plan."
+            detail = f"{e} Could not create training plan."
         )
     
 @router.get(
@@ -87,3 +93,58 @@ def get_all_exercise_plans(
         )
     
     return db_plans
+
+@router.put(
+    "/exercise_plan/{exercise_plan_id}",
+    response_model = ExercisePlanRead,
+    description="Update an existing exercise plan."
+)
+def update_existing_exercise_plan(
+    exercise_plan_id: UUID,
+    exercise_plan_data: ExercisePlanUpdate,
+    db: Session = Depends(get_db)
+):
+    try:
+        db_plan = update_exercise_plan(
+            db = db,
+            trainer_id = get_current_trainer_id(),
+            exercise_plan_id = exercise_plan_id,
+            plan_data = exercise_plan_data
+        )
+
+        if db_plan is None:
+            raise HTTPException(
+                status_code = status.HTTP_404_NOT_FOUND,
+                detail = "Exercise plan not found or access denied. Ensure the provided Exercise Plan ID and Trainer ID are correct."
+            )
+
+        return db_plan
+
+    except Exception as e:
+        raise HTTPException(
+            status_code = status.HTTP_400_BAD_REQUEST,
+            detail = f"{e} Could not update training plan."
+        )
+
+@router.delete(
+    "/exercise_plan/{exercise_plan_id}",
+    status_code = status.HTTP_204_NO_CONTENT,
+    description="Delete an existing exercise plan."
+)
+def delete_existing_exercise_plan(
+    exercise_plan_id: UUID,
+    db: Session = Depends(get_db)
+):
+    is_deleted = delete_exercise_plan(
+        db = db,
+        trainer_id = get_current_trainer_id(),
+        exercise_plan_id = exercise_plan_id
+    )
+
+    if not is_deleted:
+        raise HTTPException(
+            status_code = status.HTTP_404_NOT_FOUND,
+            detail = "Exercise plan not found or access denied."
+        )
+
+    return
