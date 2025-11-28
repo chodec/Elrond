@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from typing import Optional
 from uuid import UUID
 from app.db.models import User, Role, Client, Trainer
 from app.schemas.user import UserInitialCreate, UserUpdate
@@ -81,3 +82,6 @@ def update_user_data(
     db.refresh(db_user) 
     
     return db_user
+
+def get_user_by_id(db: Session, user_id: UUID) -> Optional[User]:
+    return db.get(User, user_id)

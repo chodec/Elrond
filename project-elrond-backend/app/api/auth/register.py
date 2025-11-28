@@ -1,6 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from uuid import UUID
+import os
+from dotenv import load_dotenv
 from app.db.database import get_db 
 from app.db.models import Role 
 from app.schemas.user import UserInitialCreate, UserUpdate, RoleUpgrade, User as UserSchema 
@@ -8,7 +10,8 @@ from app.crud.auth.user import (
     create_pending_user,
     get_user_by_email,
     upgrade_user_profile,
-    update_user_data
+    update_user_data,
+    get_user_by_id
 )
 
 router = APIRouter(tags=["Auth"])
@@ -72,15 +75,33 @@ def onboard_user_profile(
         "new_role": target_role_value
     }
 
+@router.get(
+    "/user/{user_id}", 
+    response_model=UserSchema,
+    description="Get specific user data by ID (for viewing/editing)."
+)
+def read_user_data(
+    user_id: UUID,
+    db: Session = Depends(get_db)
+):
+    db_user = get_user_by_id(db, user_id=user_id)
+    
+    if not db_user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, 
+            detail="User not found."
+        )
+        
+    return db_user
+
 @router.put(
     "/user/{user_id}",
-    response_model=UserSchema, 
-    status_code=status.HTTP_200_OK,
-    description="Update user's name or password"
+    response_model=UserSchema,
+    description="Update user's name or password by ID."
 )
-def update_user(
-    user_id: UUID, 
-    data: UserUpdate,
+def update_user_data_by_id(
+    user_id: UUID,
+    data: UserUpdate, 
     db: Session = Depends(get_db)
 ):
     if data.name is None and data.password is None:
@@ -97,9 +118,10 @@ def update_user(
         )
         
     except ValueError as e:
-        status_code_to_return = status.HTTP_404_NOT_FOUND if "not found" in str(e) else status.HTTP_400_BAD_REQUEST
+        
+        status_code = status.HTTP_404_NOT_FOUND if "not found" in str(e) else status.HTTP_400_BAD_REQUEST
         raise HTTPException(
-            status_code=status_code_to_return, 
+            status_code=status_code, 
             detail=f"Update failed: {str(e)}"
         )
         

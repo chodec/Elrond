@@ -37,4 +37,4 @@ class User(BaseModel):
     
 class RoleUpgrade(BaseModel):
     user_id: UUID
-    role: UserRole 
+    role: UserRole
