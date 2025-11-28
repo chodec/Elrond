@@ -1,9 +1,15 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
+from uuid import UUID
 from app.db.database import get_db 
 from app.db.models import Role 
-from app.schemas.user import UserInitialCreate,RoleUpgrade, User as UserSchema 
-from app.crud.auth.user import create_pending_user, get_user_by_email, upgrade_user_profile
+from app.schemas.user import UserInitialCreate, UserUpdate, RoleUpgrade, User as UserSchema 
+from app.crud.auth.user import (
+    create_pending_user,
+    get_user_by_email,
+    upgrade_user_profile,
+    update_user_data
+)
 
 router = APIRouter(tags=["Auth"])
 
@@ -65,3 +71,36 @@ def onboard_user_profile(
         "message": f"New role set: {target_role_value}.",
         "new_role": target_role_value
     }
+
+@router.put(
+    "/user/{user_id}",
+    response_model=UserSchema, 
+    status_code=status.HTTP_200_OK,
+    description="Update user's name or password"
+)
+def update_user(
+    user_id: UUID, 
+    data: UserUpdate,
+    db: Session = Depends(get_db)
+):
+    if data.name is None and data.password is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, 
+            detail="At least one field (name or password) must be provided for update."
+        )
+
+    try:
+        updated_user = update_user_data(
+            db, 
+            user_id=user_id,
+            user_data=data
+        )
+        
+    except ValueError as e:
+        status_code_to_return = status.HTTP_404_NOT_FOUND if "not found" in str(e) else status.HTTP_400_BAD_REQUEST
+        raise HTTPException(
+            status_code=status_code_to_return, 
+            detail=f"Update failed: {str(e)}"
+        )
+        
+    return updated_user

@@ -17,6 +17,10 @@ class UserRead(BaseModel):
     last_name: str
     role: UserRole
 
+class UserUpdate(BaseModel):
+    name: str | None = None
+    password: str | None = None
+
 class UserInitialCreate(BaseModel):
     email: EmailStr
     password: str
