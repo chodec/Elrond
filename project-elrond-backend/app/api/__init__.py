@@ -15,71 +15,32 @@ from .auth import register
 
 api_router = APIRouter()
 
-#trainer operations 
-api_router.include_router(
-    meal_plan.router,
-    prefix = "/trainer"
-    )
+# trainer operations
+api_router.include_router(meal_plan.router, prefix="/trainer")
 
-api_router.include_router(
-    meal.router,
-    prefix = "/trainer"
-    )
+api_router.include_router(meal.router, prefix="/trainer")
 
-api_router.include_router(
-    exercise.router,
-    prefix = "/trainer"
-    )
+api_router.include_router(exercise.router, prefix="/trainer")
 
-api_router.include_router(
-    exercise_plan.router,
-    prefix = "/trainer"
-    )
+api_router.include_router(exercise_plan.router, prefix="/trainer")
 
-api_router.include_router(
-    subscription.router,
-    prefix = "/trainer"
-    )
+api_router.include_router(subscription.router, prefix="/trainer")
 
-api_router.include_router(
-    client_trainer_requests.router, 
-    prefix = "/trainer"
-)
+api_router.include_router(client_trainer_requests.router, prefix="/trainer")
 
-api_router.include_router(
-    assigment.router, 
-    prefix = "/trainer"
-)
+api_router.include_router(assigment.router, prefix="/trainer")
 
-#client operations
-api_router.include_router(
-    measurement.router,
-    prefix = "/client"
-    )
+# client operations
+api_router.include_router(measurement.router, prefix="/client")
 
-api_router.include_router(
-    client_requests.router,
-    prefix = "/client"
-)
+api_router.include_router(client_requests.router, prefix="/client")
 
-api_router.include_router(
-    client_subscriptions.router,
-    prefix = "/client"
-)
+api_router.include_router(client_subscriptions.router, prefix="/client")
 
-api_router.include_router(
-    assignment.router,
-    prefix = "/client"
-)
+api_router.include_router(assignment.router, prefix="/client")
 
-#system
-api_router.include_router(
-    health_check.router,
-    prefix = "/system"
-    )
+# system
+api_router.include_router(health_check.router, prefix="/system")
 
-#auth
-api_router.include_router(
-    register.router, 
-    prefix = "/auth"
-)
+# auth
+api_router.include_router(register.router, prefix="/auth")

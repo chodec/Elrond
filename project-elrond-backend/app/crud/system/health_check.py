@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import text
 
+
 def check_db_health(db: Session) -> bool:
     try:
         db.execute(text("SELECT 1"))

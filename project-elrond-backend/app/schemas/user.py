@@ -1,13 +1,15 @@
 from enum import Enum as PyEnum
-import uuid 
-from uuid import UUID 
+import uuid
+from uuid import UUID
 from pydantic import EmailStr
 from pydantic import BaseModel
+
 
 class UserRole(str, PyEnum):
     CLIENT = "client"
     TRAINER = "trainer"
     PENDING = "pending"
+
 
 # Mock data model
 class UserRead(BaseModel):
@@ -17,24 +19,28 @@ class UserRead(BaseModel):
     last_name: str
     role: UserRole
 
+
 class UserUpdate(BaseModel):
     name: str | None = None
     password: str | None = None
+
 
 class UserInitialCreate(BaseModel):
     email: EmailStr
     password: str
     name: str
 
-class User(BaseModel): 
-    id: UUID 
+
+class User(BaseModel):
+    id: UUID
     email: EmailStr
-    name: str 
+    name: str
     role: UserRole
 
     class Config:
-        from_attributes = True 
-    
+        from_attributes = True
+
+
 class RoleUpgrade(BaseModel):
     user_id: UUID
     role: UserRole

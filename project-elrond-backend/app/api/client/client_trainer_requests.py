@@ -4,102 +4,97 @@ from uuid import UUID
 import os
 from dotenv import load_dotenv
 from typing import List
-from app.db.database import get_db 
+from app.db.database import get_db
 from app.schemas.client_trainer_request import RequestCreate, RequestRead
-from app.crud.trainer_operations.request.client_trainer_requests import create_request, client_cancel_request, get_client_requests
+from app.crud.trainer_operations.request.client_trainer_requests import (
+    create_request,
+    client_cancel_request,
+    get_client_requests,
+)
 
 
 def get_current_client_id() -> UUID:
     # TODO auth
-    return UUID(os.getenv("ID_CLIENT")) 
+    return UUID(os.getenv("ID_CLIENT"))
+
 
 router = APIRouter()
 
+
 @router.post(
-    "/request", 
-    response_model=RequestRead, 
+    "/request",
+    response_model=RequestRead,
     status_code=status.HTTP_201_CREATED,
-    description="Initiate relationship with trainer -> " \
-        "trainer might do not want new clients, spam protection"
+    description="Initiate relationship with trainer -> "
+    "trainer might do not want new clients, spam protection",
 )
 def submit_new_trainer_request(
-    request_data: RequestCreate,
-    db: Session = Depends(get_db) 
+    request_data: RequestCreate, db: Session = Depends(get_db)
 ):
 
     client_id = get_current_client_id()
-    
+
     try:
         db_request = create_request(
             db=db,
             client_id=client_id,
             trainer_id=request_data.trainer_id,
-            client_notes=request_data.client_initial_notes
+            client_notes=request_data.client_initial_notes,
         )
 
         if db_request is False:
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
-                detail="You already have an open (pending) request for this trainer. Please finish or cancel the previous one."
-        )
+                detail="You already have an open (pending) request for this trainer. Please finish or cancel the previous one.",
+            )
 
         if db_request is None:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="The request could not be saved due to an internal server error."
+                detail="The request could not be saved due to an internal server error.",
             )
-        
+
         return db_request
-    
+
     except HTTPException as e:
         raise e
-    
+
     except Exception as e:
-       print(e)
-       raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Internal server error"
+        print(e)
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Internal server error"
         )
+
 
 @router.patch(
     "/request/{request_id}/cancel",
     response_model=RequestRead,
-    description="Cancel initiated relationship with trainer"
+    description="Cancel initiated relationship with trainer",
 )
-def cancel_own_trainer_request(
-    request_id: UUID,
-    db: Session = Depends(get_db)
-):
+def cancel_own_trainer_request(request_id: UUID, db: Session = Depends(get_db)):
 
     client_id = get_current_client_id()
-    
+
     db_request = client_cancel_request(
-        db=db,
-        request_id=request_id,
-        client_id=client_id
+        db=db, request_id=request_id, client_id=client_id
     )
-    
+
     if db_request is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND
-        )
-    
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+
     return db_request
-    
+
+
 @router.get(
     "/requests/",
     response_model=List[RequestRead],
-    description="Get all initial relationships with trainers"
+    description="Get all initial relationships with trainers",
 )
-def get_all_client_requests(
-    db: Session = Depends(get_db)
-):
+def get_all_client_requests(db: Session = Depends(get_db)):
     client_id = get_current_client_id()
     db_requests = get_client_requests(db=db, client_id=client_id)
-    
+
     if not db_requests:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND
-        )
-        
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+
     return db_requests
