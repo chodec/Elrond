@@ -1,11 +1,10 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from uuid import UUID
 import os
 from dotenv import load_dotenv
 from app.db.database import get_db
-from app.db.models import Meal
 from app.schemas.meal import MealCreate, Meal as MealSchema, MealUpdate
 from app.crud.trainer_operations.meal.meals import (
     create_meal,
@@ -15,80 +14,73 @@ from app.crud.trainer_operations.meal.meals import (
     delete_meal,
 )
 
+router = APIRouter(tags=["Trainer Meals"])
 
-router = APIRouter()
-
-
+# TODO: Nahradit skutečným JWT dekódováním
 def get_current_trainer_id() -> UUID:
-    # TODO auth
+    load_dotenv()
     return UUID(os.getenv("ID_TRAINER"))
-
 
 @router.post(
     "/meal",
     response_model=MealSchema,
     status_code=status.HTTP_201_CREATED,
-    description="Create meal -> nutri score is specified in the meal plan",
+    description="Create a base meal that can be added to meal plans.",
 )
 def create_new_meal(data: MealCreate, db: Session = Depends(get_db)):
-
-    new_meal = create_meal(db, meal_name=data.name, trainer_id=get_current_trainer_id())
-
-    return new_meal
-
+    try:
+        return create_meal(db, meal_name=data.name, trainer_id=get_current_trainer_id())
+    except RuntimeError as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @router.get(
-    "/meal/{meal_id}", response_model=MealSchema, description="Get specific meal by ID"
+    "/meal/{meal_id}", 
+    response_model=MealSchema, 
+    description="Get specific meal by ID."
 )
 def get_meal_by_id(meal_id: UUID, db: Session = Depends(get_db)):
-    db_plan = read_meal(db=db, meal_id=meal_id, trainer_id=get_current_trainer_id())
-
-    if db_plan is None:
+    db_meal = read_meal(db=db, meal_id=meal_id, trainer_id=get_current_trainer_id())
+    
+    if not db_meal:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Meal not found or access denied. Ensure the provided Exercise Plan ID and Trainer ID are correct.",
+            detail="Meal not found or access denied."
         )
+    return db_meal
 
-    return db_plan
-
-
-@router.get("/meal/", response_model=List[MealSchema], description="Get all meals")
-def get_all_meals(search: Optional[str] = None, db: Session = Depends(get_db)):
-    db_plans = read_all_meals(db=db, search=search, trainer_id=get_current_trainer_id())
-
-    if not db_plans:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Meals not found or access denied. Make sure to create exercise plan.",
-        )
-
-    return db_plans
-
+@router.get(
+    "/meal/", 
+    response_model=List[MealSchema], 
+    description="Get all meals created by the trainer."
+)
+def get_all_meals(
+    search: Optional[str] = Query(None), 
+    db: Session = Depends(get_db)
+):
+    # Opět: pro prázdné výsledky vracíme 200 OK [], ne 404.
+    return read_all_meals(db=db, search=search, trainer_id=get_current_trainer_id())
 
 @router.put(
-    "/meal/{meal_id}", response_model=MealSchema, description="Update an existing meal."
+    "/meal/{meal_id}", 
+    response_model=MealSchema, 
+    description="Update an existing meal's name."
 )
 def update_existing_meal(
-    meal_id: UUID, data: MealUpdate, db: Session = Depends(get_db)
+    meal_id: UUID, 
+    data: MealUpdate, 
+    db: Session = Depends(get_db)
 ):
     try:
-        updated_meal = update_meal(
-            db=db, meal_id=meal_id, trainer_id=get_current_trainer_id(), data=data
+        return update_meal(
+            db=db, 
+            meal_id=meal_id, 
+            trainer_id=get_current_trainer_id(), 
+            data=data
         )
-
-        if updated_meal is None:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Meal not found or access denied.",
-            )
-
-        return updated_meal
-
-    except Exception:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="Could not update meal."
-        )
-
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except RuntimeError as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @router.delete(
     "/meal/{meal_id}",
@@ -97,20 +89,13 @@ def update_existing_meal(
 )
 def delete_existing_meal(meal_id: UUID, db: Session = Depends(get_db)):
     try:
-        is_deleted = delete_meal(
-            db=db, meal_id=meal_id, trainer_id=get_current_trainer_id()
-        )
-
-        if not is_deleted:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Meal not found or access denied.",
-            )
-
+        delete_meal(db=db, meal_id=meal_id, trainer_id=get_current_trainer_id())
         return
-
-    except Exception:
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except RuntimeError as e:
+        # Tady zachycujeme pokus o smazání jídla, které je v jídelníčku (FK constraint)
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail="Cannot delete meal. It is currently referenced by one or more meal plans.",
+            detail="Cannot delete meal. It is currently part of one or more meal plans."
         )

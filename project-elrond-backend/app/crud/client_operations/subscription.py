@@ -14,21 +14,15 @@ from app.db.models import (
 from app.schemas.client_subscription import ClientSubscriptionCreate
 from app.crud.trainer_operations.subscriptions import subscriptions as crud_tiers
 
-
 def _calculate_end_date(tier: TrainerSubscriptionTier) -> datetime:
-
     today = datetime.now()
-
     if tier.price_yearly is not None and tier.price_yearly > 0:
         return today + timedelta(days=365)
-    else:
-        return today + timedelta(days=30)
-
+    return today + timedelta(days=30)
 
 def get_active_subscription(
     db: Session, client_id: UUID, trainer_id: UUID
 ) -> Optional[ClientSubscription]:
-
     return (
         db.query(ClientSubscription)
         .options(joinedload(ClientSubscription.tier))
@@ -41,7 +35,6 @@ def get_active_subscription(
         .first()
     )
 
-
 def get_subscriptions_for_client(
     db: Session, client_id: UUID
 ) -> List[ClientSubscription]:
@@ -53,16 +46,15 @@ def get_subscriptions_for_client(
         .all()
     )
 
-
 def create_mocked_subscription(
     db: Session, client_id: UUID, data: ClientSubscriptionCreate
-) -> Optional[ClientSubscription]:
-
+) -> ClientSubscription:
     tier = crud_tiers.get_tier_by_id_and_trainer(
         db, tier_id=data.tier_id, trainer_id=data.trainer_id
     )
+    
     if not tier:
-        return None
+        raise ValueError("Subscription tier not found for this trainer")
 
     end_date = _calculate_end_date(tier)
 
@@ -79,10 +71,9 @@ def create_mocked_subscription(
         db.commit()
         db.refresh(db_subscription)
         return db_subscription
-
-    except exc.IntegrityError:
+    except exc.IntegrityError as e:
         db.rollback()
-        return None
-    except Exception:
+        raise RuntimeError(f"Subscription already exists or integrity constraint failed: {str(e)}")
+    except exc.SQLAlchemyError as e:
         db.rollback()
-        return None
+        raise RuntimeError(f"Database error during subscription creation: {str(e)}")

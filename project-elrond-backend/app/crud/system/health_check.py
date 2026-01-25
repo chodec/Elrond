@@ -1,11 +1,12 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import text
-
+from sqlalchemy.exc import SQLAlchemyError
 
 def check_db_health(db: Session) -> bool:
     try:
         db.execute(text("SELECT 1"))
         return True
-    except Exception as e:
-        print(f"Database health check failed: {e}")
+    except SQLAlchemyError as e:
+        return e
+    except Exception:
         return False
